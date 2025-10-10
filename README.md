@@ -7,3 +7,4 @@ npm i
 
 npm start
 ```
+<p align="center">© 2025 <b>yanis26x</b> · MySalat App</p>
