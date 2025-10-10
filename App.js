@@ -1,6 +1,6 @@
 // App.js
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Platform, Alert, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, Platform, Alert, ActivityIndicator, ScrollView, Linking, Pressable } from "react-native";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { format } from "date-fns";
@@ -75,8 +75,6 @@ export default function App() {
         const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
 
         let city = "Unknown";
-        let region = "";
-        let country = "";
         if (places.length > 0) {
           city =
             places[0].city ||
@@ -85,12 +83,10 @@ export default function App() {
             places[0].district ||
             places[0].country ||
             "Unknown";
-          region = places[0].region || "";
-          country = places[0].country || "";
         }
 
         const prettyCity = city;
-        setCoords({ lat, lon, city, region, country, prettyCity });
+        setCoords({ lat, lon, prettyCity });
 
         // ✅ Calcul Qibla
         const qb = qiblaBearing(lat, lon);
@@ -167,15 +163,21 @@ export default function App() {
     );
   }
 
+  // ✅ Fonction pour ouvrir Instagram
+  const openInstagram = () => {
+    const url = "https://www.instagram.com/yanis26x";
+    Linking.openURL(url).catch((err) => console.error("Error opening Instagram:", err));
+  };
+
   return (
     <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: 36 }}
+          contentContainerStyle={{ padding: 20, paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* 📍 Localisation (en haut) */}
+          {/* 📍 Localisation */}
           <View style={{ alignItems: "center", marginTop: 10, marginBottom: 12 }}>
             <View
               style={{
@@ -331,10 +333,24 @@ export default function App() {
           </View>
 
           {/* Footer */}
-          <View style={{ marginTop: 16, alignItems: "center" }}>
-            <Text style={{ color: CARD.sub, fontSize: 13 }}>
+          <View style={{ marginTop: 30, alignItems: "center" }}>
+            <Text style={{ color: CARD.sub, fontSize: 13, opacity: 0.9 }}>
               Notifications enabled · {scheduledCount} reminders set
             </Text>
+
+            <Pressable onPress={openInstagram}>
+              <Text
+                style={{
+                  color: CARD.accent,
+                  fontSize: 14,
+                  fontWeight: "700",
+                  marginTop: 8,
+                  letterSpacing: 0.5,
+                }}
+              >
+                © 2025 @yanis26x
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
