@@ -241,6 +241,9 @@ export default function QiblaScreen() {
               Turn your phone until the arrow points up to face the Qibla.
             </Text>
           )}
+          <Text style={{ color: CARD.accent, fontSize: 14, fontWeight: "700", marginTop: 8, letterSpacing: 0.5 }}>
+                          © 2025 @yanis26x · Tous droits réservé
+                        </Text>
         </View>
       </SafeAreaView>
     </LinearGradient>

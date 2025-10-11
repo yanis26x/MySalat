@@ -1,6 +1,14 @@
 // src/screens/NotesScreen.js
 import React from "react";
-import { View, Text, ScrollView, Pressable, Alert, Linking, Platform } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Alert,
+  Linking,
+  Platform,
+} from "react-native";
 import * as Notifications from "expo-notifications";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,9 +31,13 @@ function SectionHeader({ icon, title, subtitle }) {
     <View style={{ marginBottom: 12 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         <Ionicons name={icon} size={20} color={CARD.accent} />
-        <Text style={{ color: CARD.text, fontSize: 18, fontWeight: "800" }}>{title}</Text>
+        <Text style={{ color: CARD.text, fontSize: 18, fontWeight: "800" }}>
+          {title}
+        </Text>
       </View>
-      {subtitle ? <Text style={{ color: CARD.sub, marginTop: 4 }}>{subtitle}</Text> : null}
+      {subtitle ? (
+        <Text style={{ color: CARD.sub, marginTop: 4 }}>{subtitle}</Text>
+      ) : null}
     </View>
   );
 }
@@ -38,7 +50,10 @@ async function openExternal(urls) {
     }
     await Linking.openURL(urls.web);
   } catch {
-    Alert.alert("Ouverture impossible", "Vérifie que l’app ou le navigateur est disponible.");
+    Alert.alert(
+      "Ouverture impossible",
+      "Vérifie que l’app ou le navigateur est disponible."
+    );
   }
 }
 
@@ -48,12 +63,15 @@ export default function NotesScreen() {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "🕌 Test Notification",
-          body: "Ceci est un test — les notifications fonctionnent ✅",
+          body: "Ceci est un test — les notifs marche ! ✅",
           sound: true,
         },
         trigger: { seconds: 5 },
       });
-      Alert.alert("Notification test", "Une notification sera envoyée dans 5 secondes.");
+      Alert.alert(
+        "Notification test",
+        "Une notification sera envoyée...."
+      );
     } catch (e) {
       console.error("Test notification error:", e);
       Alert.alert("Erreur", "Impossible de programmer une notification test.");
@@ -66,8 +84,14 @@ export default function NotesScreen() {
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
-            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>Notes</Text>
-            <Text style={{ color: CARD.sub, marginTop: 6, textAlign: "center" }}>@yanis26x</Text>
+            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>
+              Notes
+            </Text>
+            <Text
+              style={{ color: CARD.sub, marginTop: 6, textAlign: "center" }}
+            >
+              @yanis26x
+            </Text>
           </View>
 
           {/* About */}
@@ -92,8 +116,11 @@ export default function NotesScreen() {
               subtitle="26x"
             />
             <Text style={{ color: CARD.text, fontSize: 16, lineHeight: 22 }}>
-              MySalat is a modern and minimalist mobile app built with React Native (Expo) that helps you stay connected to your faith.{"\n\n"}
-              It automatically detects your location to display accurate prayer times, shows the Qibla direction, and sends smart notifications before each prayer — all wrapped in a clean, elegant design.
+              MySalat is a modern and minimalist mobile app built with React
+              Native (Expo) that helps you stay connected to your faith.{"\n\n"}
+              It automatically detects your location to display accurate prayer
+              times, shows the Qibla direction, and sends smart notifications
+              before each prayer — all wrapped in a clean, elegant design.
             </Text>
           </View>
 
@@ -113,7 +140,11 @@ export default function NotesScreen() {
               elevation: 6,
             }}
           >
-            <SectionHeader icon="heart-outline" title="Follow me" subtitle="Let’s connect" />
+            <SectionHeader
+              icon="heart-outline"
+              title="Follow me"
+              subtitle="Let’s connect"
+            />
 
             {/* Instagram */}
             <Pressable
@@ -139,7 +170,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-instagram" size={22} color={CARD.text} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: CARD.text, fontWeight: "700" }}>Instagram</Text>
+                <Text style={{ color: CARD.text, fontWeight: "700" }}>
+                  Instagram
+                </Text>
                 <Text style={{ color: CARD.sub }}>@{INSTAGRAM_USER}</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={CARD.sub} />
@@ -147,7 +180,9 @@ export default function NotesScreen() {
 
             {/* GitHub */}
             <Pressable
-              onPress={() => openExternal({ web: `https://github.com/${GITHUB_USER}` })}
+              onPress={() =>
+                openExternal({ web: `https://github.com/${GITHUB_USER}` })
+              }
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -161,7 +196,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-github" size={22} color={CARD.text} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: CARD.text, fontWeight: "700" }}>GitHub</Text>
+                <Text style={{ color: CARD.text, fontWeight: "700" }}>
+                  GitHub
+                </Text>
                 <Text style={{ color: CARD.sub }}>@{GITHUB_USER}</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={CARD.sub} />
@@ -182,7 +219,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-linkedin" size={22} color="#0A66C2" />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: CARD.text, fontWeight: "700" }}>LinkedIn</Text>
+                <Text style={{ color: CARD.text, fontWeight: "700" }}>
+                  LinkedIn
+                </Text>
                 <Text style={{ color: CARD.sub }}>@yanis26x</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={CARD.sub} />
@@ -217,7 +256,7 @@ export default function NotesScreen() {
               }}
             >
               <Text style={{ color: CARD.accent, fontWeight: "700" }}>
-                Tester les notifications (5s)
+                Tester les notifications
               </Text>
             </Pressable>
           </View>

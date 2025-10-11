@@ -221,11 +221,11 @@ function HomeScreen() {
               Notifications enabled · {scheduledCount} reminders set
             </Text> */}
 
-            <Pressable onPress={() => Linking.openURL("https://www.instagram.com/yanis26x")}>
+            
               <Text style={{ color: CARD.accent, fontSize: 14, fontWeight: "700", marginTop: 8, letterSpacing: 0.5 }}>
-                © 2025 @yanis26x
+                © 2025 @yanis26x · Tous droits réservé
               </Text>
-            </Pressable>
+
           </View>
         </ScrollView>
       </SafeAreaView>
