@@ -1,6 +1,15 @@
 # MySalat
 Minimalist mobile app that automatically notifies users of upcoming prayer times based on their location. Built with Expo &amp; React Native.
 
+# Realease
+L’application est **techniquement terminée** et prête à être publiée.
+Toutes les principales fonctionnalités sont fonctionnelles
+
+Mais, il reste **quelques ajustements** avant la mise en ligne officielle :
+- L’intégration des **publicités AdMob** n’est pas encore terminée (le module est installé, mais j’ai besoin d’aide pour la configuration finale).
+- Le **schéma de couleurs** est encore provisoire — il sera ajusté dans la version finale pour un rendu plus harmonieux.
+
+
 ### No Demo
 [See on YouTube]()
 
