@@ -16,6 +16,7 @@ const CARD = {
 
 const INSTAGRAM_USER = "yanis26x";
 const GITHUB_USER = "yanis26x";
+const LINKEDIN_URL = "https://www.linkedin.com/in/yanis-djenadi-058964307/";
 
 function SectionHeader({ icon, title, subtitle }) {
   return (
@@ -66,12 +67,10 @@ export default function NotesScreen() {
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
             <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>Notes</Text>
-            <Text style={{ color: CARD.sub, marginTop: 6, textAlign: "center" }}>
-              @yanis26x
-            </Text>
+            <Text style={{ color: CARD.sub, marginTop: 6, textAlign: "center" }}>@yanis26x</Text>
           </View>
 
-          {/* About & tips (statique) */}
+          {/* About */}
           <View
             style={{
               backgroundColor: CARD.bg,
@@ -93,8 +92,8 @@ export default function NotesScreen() {
               subtitle="26x"
             />
             <Text style={{ color: CARD.text, fontSize: 16, lineHeight: 22 }}>
-              MySalat is a modern and minimalist mobile app built with React Native (Expo) that helps you stay connected to your faith.
-                It automatically detects your location to display accurate prayer times, shows the Qibla direction, and sends smart notifications before each prayer — all wrapped in a clean, elegant design.
+              MySalat is a modern and minimalist mobile app built with React Native (Expo) that helps you stay connected to your faith.{"\n\n"}
+              It automatically detects your location to display accurate prayer times, shows the Qibla direction, and sends smart notifications before each prayer — all wrapped in a clean, elegant design.
             </Text>
           </View>
 
@@ -156,6 +155,7 @@ export default function NotesScreen() {
                 borderRadius: 12,
                 borderColor: CARD.border,
                 borderWidth: 1,
+                marginBottom: 10,
                 gap: 12,
               }}
             >
@@ -166,9 +166,30 @@ export default function NotesScreen() {
               </View>
               <Ionicons name="open-outline" size={18} color={CARD.sub} />
             </Pressable>
+
+            {/* LinkedIn */}
+            <Pressable
+              onPress={() => openExternal({ web: LINKEDIN_URL })}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 14,
+                borderRadius: 12,
+                borderColor: CARD.border,
+                borderWidth: 1,
+                gap: 12,
+              }}
+            >
+              <Ionicons name="logo-linkedin" size={22} color="#0A66C2" />
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: CARD.text, fontWeight: "700" }}>LinkedIn</Text>
+                <Text style={{ color: CARD.sub }}>@yanis26x</Text>
+              </View>
+              <Ionicons name="open-outline" size={18} color={CARD.sub} />
+            </Pressable>
           </View>
 
-          {/* Dev tools (test notif) */}
+          {/* Dev tools */}
           <View
             style={{
               backgroundColor: CARD.bg,
