@@ -200,6 +200,31 @@ export default function App() {
     return (qibla - heading + 360) % 360;
   }, [qibla, heading]);
 
+  // 🔔 Bouton de test de notification (5 secondes)
+  async function testNotification() {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "🕌 Test Notification",
+          body: "Ceci est un test — les notifications fonctionnent ✅",
+          sound: true,
+        },
+        trigger: { seconds: 5 }, // envoie après 5s
+      });
+      Alert.alert("Notification test", "Une notification sera envoyée dans 5 secondes.");
+    } catch (e) {
+      console.error("Test notification error:", e);
+      Alert.alert("Erreur", "Impossible de programmer une notification test.");
+    }
+  }
+
+  const openInstagram = () => {
+    const url = "https://www.instagram.com/yanis26x";
+    Linking.openURL(url).catch((err) =>
+      console.error("Error opening Instagram:", err)
+    );
+  };
+
   if (loading) {
     return (
       <LinearGradient
@@ -213,13 +238,6 @@ export default function App() {
       </LinearGradient>
     );
   }
-
-  const openInstagram = () => {
-    const url = "https://www.instagram.com/yanis26x";
-    Linking.openURL(url).catch((err) =>
-      console.error("Error opening Instagram:", err)
-    );
-  };
 
   return (
     <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1 }}>
@@ -257,6 +275,25 @@ export default function App() {
               26x
             </Text>
           </View>
+
+          {/* 🔔 Bouton test notif */}
+          <Pressable
+            onPress={testNotification}
+            style={{
+              alignSelf: "center",
+              backgroundColor: "rgba(59, 130, 246, 0.15)",
+              borderColor: CARD.accent,
+              borderWidth: 1,
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              borderRadius: 12,
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{ color: CARD.accent, fontWeight: "700" }}>
+              Tester les notifs!
+            </Text>
+          </Pressable>
 
           {/* Card: Next prayer */}
           <View
@@ -403,7 +440,7 @@ export default function App() {
               Notifications enabled · {scheduledCount} reminders set
             </Text>
 
-            <Pressable onPress={() => openInstagram()}>
+            <Pressable onPress={openInstagram}>
               <Text
                 style={{
                   color: CARD.accent,
