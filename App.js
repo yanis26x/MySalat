@@ -1,8 +1,18 @@
 // App.js
-import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Platform, Alert, ActivityIndicator, ScrollView, Linking, Pressable } from "react-native";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  Platform,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  Linking,
+  Pressable,
+} from "react-native";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
+import { Audio } from "expo-av"; // 🔊 son
 import { format } from "date-fns";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,9 +34,11 @@ const CARD = {
   sub: "#9CA3AF",
   accent: "#3B82F6",
   border: "#1a1a1a",
+  success: "#22c55e", // ✅ vert quand aligné Qibla
 };
 
 const PRAYERS = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+const ALIGN_TOLERANCE_DEG = 10; // ±10°
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -37,11 +49,32 @@ export default function App() {
   const [now, setNow] = useState(new Date());
   const [heading, setHeading] = useState(0);
   const [qibla, setQibla] = useState(null);
+  const [isFacingQibla, setIsFacingQibla] = useState(false); // ✅ alignement
+  const soundRef = useRef(null);
 
-  // live timer
+  // live timer (countdown)
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
+  }, []);
+
+  // Charger le son de réussite Qibla
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require("./assets/qibla-success.mp3")
+        );
+        if (mounted) soundRef.current = sound;
+      } catch (e) {
+        console.warn("Failed to load sound:", e);
+      }
+    })();
+    return () => {
+      mounted = false;
+      soundRef.current?.unloadAsync();
+    };
   }, []);
 
   useEffect(() => {
@@ -62,37 +95,38 @@ export default function App() {
         const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
         setPermState((s) => ({ ...s, loc: locStatus }));
         if (locStatus !== "granted") {
-          Alert.alert("Localisation requise", "Active la localisation pour calculer les horaires et la Qibla.");
+          Alert.alert(
+            "Localisation requise",
+            "Active la localisation pour calculer les horaires et la Qibla."
+          );
           setLoading(false);
           return;
         }
 
-        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        const pos = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
 
-        // ✅ Inverse géocodage
+        // Inverse géocodage (ville)
         const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
-
-        let city = "Unknown";
-        if (places.length > 0) {
-          city =
-            places[0].city ||
-            places[0].subregion ||
-            places[0].region ||
-            places[0].district ||
-            places[0].country ||
-            "Unknown";
-        }
-
-        const prettyCity = city;
+        const prettyCity =
+          places.length > 0
+            ? places[0].city ||
+              places[0].subregion ||
+              places[0].region ||
+              places[0].district ||
+              places[0].country ||
+              "Unknown"
+            : "Unknown";
         setCoords({ lat, lon, prettyCity });
 
-        // ✅ Calcul Qibla
+        // Qibla
         const qb = qiblaBearing(lat, lon);
         setQibla(qb);
 
-        // ✅ Boussole
+        // Boussole
         headingSub = await Location.watchHeadingAsync((h) => {
           const hdg =
             (typeof h.trueHeading === "number" && !Number.isNaN(h.trueHeading))
@@ -101,11 +135,10 @@ export default function App() {
           setHeading(((hdg % 360) + 360) % 360);
         });
 
-        // Horaires
+        // Horaires + Notifications
         const times = getPrayerTimesForDate(lat, lon, new Date());
         setTodayTimes(times);
 
-        // Notifications
         const count = await scheduleNextDays(lat, lon, 7);
         setScheduledCount(count);
       } catch (e) {
@@ -118,9 +151,23 @@ export default function App() {
 
     return () => {
       if (headingSub) headingSub.remove?.();
-      headingSub = null;
     };
   }, []);
+
+  // Détection alignement Qibla (joue le son à l'entrée)
+  useEffect(() => {
+    if (qibla == null) return;
+    // diff d'angle minimale (0..180)
+    const diff = Math.abs(((qibla - heading + 540) % 360) - 180);
+    const aligned = diff < ALIGN_TOLERANCE_DEG;
+
+    if (aligned && !isFacingQibla) {
+      setIsFacingQibla(true);
+      soundRef.current?.replayAsync().catch(() => {});
+    } else if (!aligned && isFacingQibla) {
+      setIsFacingQibla(false);
+    }
+  }, [heading, qibla]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextInfo = useMemo(() => {
     if (!todayTimes) return null;
@@ -150,23 +197,28 @@ export default function App() {
 
   const arrowAngle = useMemo(() => {
     if (!qibla) return 0;
-    const diff = (qibla - heading + 360) % 360;
-    return diff;
+    return (qibla - heading + 360) % 360;
   }, [qibla, heading]);
 
   if (loading) {
     return (
-      <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <LinearGradient
+        colors={["#0a2472", "#000000"]}
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      >
         <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={{ color: CARD.sub, marginTop: 12 }}>Preparing your prayer times…</Text>
+        <Text style={{ color: CARD.sub, marginTop: 12 }}>
+          Preparing your prayer times…
+        </Text>
       </LinearGradient>
     );
   }
 
-  // ✅ Fonction pour ouvrir Instagram
   const openInstagram = () => {
     const url = "https://www.instagram.com/yanis26x";
-    Linking.openURL(url).catch((err) => console.error("Error opening Instagram:", err));
+    Linking.openURL(url).catch((err) =>
+      console.error("Error opening Instagram:", err)
+    );
   };
 
   return (
@@ -190,15 +242,20 @@ export default function App() {
               }}
             >
               <Text style={{ color: CARD.text, fontSize: 14, fontWeight: "700" }}>
-                <Text style={{ opacity: 0.85 }}>📍</Text> {coords?.prettyCity ?? "Unknown"}
+                <Text style={{ opacity: 0.85 }}>📍</Text>{" "}
+                {coords?.prettyCity ?? "Unknown"}
               </Text>
             </View>
           </View>
 
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
-            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>MySalat</Text>
-            <Text style={{ color: CARD.sub, marginTop: 4 }}>Automatic prayer notifications</Text>
+            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>
+              MySalat
+            </Text>
+            <Text style={{ color: CARD.sub, marginTop: 4 }}>
+              26x
+            </Text>
           </View>
 
           {/* Card: Next prayer */}
@@ -214,8 +271,17 @@ export default function App() {
           >
             {nextInfo ? (
               <>
-                <Text style={{ color: CARD.sub, marginBottom: 6 }}>Next prayer</Text>
-                <Text style={{ color: CARD.text, fontSize: 22, fontWeight: "700", marginBottom: 4 }}>
+                <Text style={{ color: CARD.sub, marginBottom: 6 }}>
+                  Next prayer
+                </Text>
+                <Text
+                  style={{
+                    color: CARD.text,
+                    fontSize: 22,
+                    fontWeight: "700",
+                    marginBottom: 4,
+                  }}
+                >
                   {nextInfo.key.toUpperCase()} · {format(nextInfo.at, "HH:mm")}
                 </Text>
                 <Text style={{ color: CARD.accent, fontSize: 16 }}>
@@ -224,7 +290,8 @@ export default function App() {
               </>
             ) : (
               <Text style={{ color: CARD.sub }}>
-                All prayers passed for today. You’re scheduled for the next days.
+                All prayers passed for today. You’re scheduled for the next
+                days.
               </Text>
             )}
           </View>
@@ -252,14 +319,24 @@ export default function App() {
                     borderBottomWidth: 1,
                   }}
                 >
-                  <Text style={{ color: CARD.text, fontSize: 16, textTransform: "capitalize" }}>{k}</Text>
+                  <Text
+                    style={{
+                      color: CARD.text,
+                      fontSize: 16,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {k}
+                  </Text>
                   <Text style={{ color: CARD.text, fontSize: 16 }}>
                     {format(todayTimes[k], "HH:mm")}
                   </Text>
                 </View>
               ))
             ) : (
-              <Text style={{ color: "#fca5a5" }}>Failed to compute prayer times.</Text>
+              <Text style={{ color: "#fca5a5" }}>
+                Failed to compute prayer times.
+              </Text>
             )}
           </View>
 
@@ -275,7 +352,9 @@ export default function App() {
               alignItems: "center",
             }}
           >
-            <Text style={{ color: CARD.sub, marginBottom: 10 }}>Qibla direction</Text>
+            <Text style={{ color: CARD.sub, marginBottom: 10 }}>
+              Qibla direction
+            </Text>
 
             <View
               style={{
@@ -288,27 +367,7 @@ export default function App() {
                 justifyContent: "center",
               }}
             >
-              <View
-                style={{
-                  position: "absolute",
-                  width: 140,
-                  height: 140,
-                  borderRadius: 70,
-                  borderWidth: 1,
-                  borderColor: "#141414",
-                }}
-              />
-              <View
-                style={{
-                  position: "absolute",
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  borderWidth: 1,
-                  borderColor: "#141414",
-                }}
-              />
-
+              {/* Flèche */}
               <View
                 style={{
                   width: 0,
@@ -318,18 +377,24 @@ export default function App() {
                   borderBottomWidth: 60,
                   borderLeftColor: "transparent",
                   borderRightColor: "transparent",
-                  borderBottomColor: CARD.accent,
+                  borderBottomColor: isFacingQibla ? CARD.success : CARD.accent, // 💚 vert si aligné
                   transform: [{ rotate: `${arrowAngle}deg` }, { translateY: -10 }],
                 }}
               />
             </View>
 
             <Text style={{ color: CARD.text, marginTop: 12, fontSize: 16 }}>
-              {qibla != null ? `Face toward: ${Math.round(qibla)}°` : "—"}
+              {isFacingQibla
+                ? "✅ You're facing the Qibla!"
+                : qibla != null
+                ? `Face toward: ${Math.round(qibla)}°`
+                : "—"}
             </Text>
-            <Text style={{ color: CARD.sub, marginTop: 4, fontSize: 13 }}>
-              Turn your phone until the arrow points up to face the Qibla.
-            </Text>
+            {!isFacingQibla && (
+              <Text style={{ color: CARD.sub, marginTop: 4, fontSize: 13 }}>
+                Turn your phone until the arrow points up to face the Qibla.
+              </Text>
+            )}
           </View>
 
           {/* Footer */}
@@ -338,7 +403,7 @@ export default function App() {
               Notifications enabled · {scheduledCount} reminders set
             </Text>
 
-            <Pressable onPress={openInstagram}>
+            <Pressable onPress={() => openInstagram()}>
               <Text
                 style={{
                   color: CARD.accent,

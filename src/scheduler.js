@@ -46,7 +46,7 @@ export async function scheduleNextDays(lat, lon, days = 7) {
           body: LABELS.find(([n]) => n === name)?.[1] || "It's time to pray.",
           sound: true,
         },
-        trigger: when, // absolute local Date
+        trigger: { type: "date", date: when },
       });
       scheduled++;
     }
