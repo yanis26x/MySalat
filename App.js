@@ -1,9 +1,8 @@
 // App.js
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
-  Platform,
   Alert,
   ActivityIndicator,
   ScrollView,
@@ -12,13 +11,18 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
-import { Audio } from "expo-av"; // 🔊 son
 import { format } from "date-fns";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPrayerTimesForDate } from "./src/prayerTimes";
 import { scheduleNextDays } from "./src/scheduler";
-import { qiblaBearing } from "./src/qibla";
+import NotesScreen from "./src/screens/NotesScreen";
+import QiblaScreen from "./src/screens/QiblaScreen";
+
+// 🧭 Navigation
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -34,108 +38,51 @@ const CARD = {
   sub: "#9CA3AF",
   accent: "#3B82F6",
   border: "#1a1a1a",
-  success: "#22c55e", // ✅ vert quand aligné Qibla
 };
 
 const PRAYERS = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
-const ALIGN_TOLERANCE_DEG = 10; // ±10°
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+
+/* ---------- HOME SCREEN (Qibla retirée d'ici) ---------- */
+function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
   const [todayTimes, setTodayTimes] = useState(null);
-  const [permState, setPermState] = useState({ notif: "unknown", loc: "unknown" });
   const [scheduledCount, setScheduledCount] = useState(0);
   const [now, setNow] = useState(new Date());
-  const [heading, setHeading] = useState(0);
-  const [qibla, setQibla] = useState(null);
-  const [isFacingQibla, setIsFacingQibla] = useState(false); // ✅ alignement
-  const soundRef = useRef(null);
 
-  // live timer (countdown)
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Charger le son de réussite Qibla
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          require("./assets/qibla-success.mp3")
-        );
-        if (mounted) soundRef.current = sound;
-      } catch (e) {
-        console.warn("Failed to load sound:", e);
-      }
-    })();
-    return () => {
-      mounted = false;
-      soundRef.current?.unloadAsync();
-    };
-  }, []);
-
-  useEffect(() => {
-    let headingSub = null;
-
     (async () => {
       try {
         const notifPerm = await Notifications.requestPermissionsAsync();
-        setPermState((s) => ({ ...s, notif: notifPerm.status }));
-
-        if (Platform.OS === "android") {
-          await Notifications.setNotificationChannelAsync("default", {
-            name: "default",
-            importance: Notifications.AndroidImportance.HIGH,
-          });
+        if (notifPerm.status !== "granted") {
+          // pas bloquant, on continue
         }
 
         const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
-        setPermState((s) => ({ ...s, loc: locStatus }));
         if (locStatus !== "granted") {
-          Alert.alert(
-            "Localisation requise",
-            "Active la localisation pour calculer les horaires et la Qibla."
-          );
+          Alert.alert("Localisation requise", "Active la localisation pour calculer les horaires.");
           setLoading(false);
           return;
         }
 
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
 
-        // Inverse géocodage (ville)
         const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
         const prettyCity =
           places.length > 0
-            ? places[0].city ||
-              places[0].subregion ||
-              places[0].region ||
-              places[0].district ||
-              places[0].country ||
-              "Unknown"
+            ? places[0].city || places[0].subregion || places[0].region || places[0].country || "Unknown"
             : "Unknown";
         setCoords({ lat, lon, prettyCity });
 
-        // Qibla
-        const qb = qiblaBearing(lat, lon);
-        setQibla(qb);
-
-        // Boussole
-        headingSub = await Location.watchHeadingAsync((h) => {
-          const hdg =
-            (typeof h.trueHeading === "number" && !Number.isNaN(h.trueHeading))
-              ? h.trueHeading
-              : (typeof h.magHeading === "number" ? h.magHeading : 0);
-          setHeading(((hdg % 360) + 360) % 360);
-        });
-
-        // Horaires + Notifications
         const times = getPrayerTimesForDate(lat, lon, new Date());
         setTodayTimes(times);
 
@@ -148,32 +95,12 @@ export default function App() {
         setLoading(false);
       }
     })();
-
-    return () => {
-      if (headingSub) headingSub.remove?.();
-    };
   }, []);
-
-  // Détection alignement Qibla (joue le son à l'entrée)
-  useEffect(() => {
-    if (qibla == null) return;
-    // diff d'angle minimale (0..180)
-    const diff = Math.abs(((qibla - heading + 540) % 360) - 180);
-    const aligned = diff < ALIGN_TOLERANCE_DEG;
-
-    if (aligned && !isFacingQibla) {
-      setIsFacingQibla(true);
-      soundRef.current?.replayAsync().catch(() => {});
-    } else if (!aligned && isFacingQibla) {
-      setIsFacingQibla(false);
-    }
-  }, [heading, qibla]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextInfo = useMemo(() => {
     if (!todayTimes) return null;
     const order = PRAYERS.map((k) => [k, todayTimes[k]]);
     const upcoming = order
-      .map(([k, d]) => [k, d])
       .filter(([, d]) => d && d.getTime() > now.getTime())
       .sort((a, b) => a[1] - b[1]);
     if (upcoming.length > 0) {
@@ -195,46 +122,11 @@ export default function App() {
     return `${pad(h)}:${pad(m)}:${pad(sec)}`;
   }
 
-  const arrowAngle = useMemo(() => {
-    if (!qibla) return 0;
-    return (qibla - heading + 360) % 360;
-  }, [qibla, heading]);
-
-  // 🔔 Bouton de test de notification (5 secondes)
-  async function testNotification() {
-    try {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "🕌 Test Notification",
-          body: "Ceci est un test — les notifications fonctionnent ✅",
-          sound: true,
-        },
-        trigger: { seconds: 5 }, // envoie après 5s
-      });
-      Alert.alert("Notification test", "Une notification sera envoyée dans 5 secondes.");
-    } catch (e) {
-      console.error("Test notification error:", e);
-      Alert.alert("Erreur", "Impossible de programmer une notification test.");
-    }
-  }
-
-  const openInstagram = () => {
-    const url = "https://www.instagram.com/yanis26x";
-    Linking.openURL(url).catch((err) =>
-      console.error("Error opening Instagram:", err)
-    );
-  };
-
   if (loading) {
     return (
-      <LinearGradient
-        colors={["#0a2472", "#000000"]}
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
+      <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={{ color: CARD.sub, marginTop: 12 }}>
-          Preparing your prayer times…
-        </Text>
+        <Text style={{ color: CARD.sub, marginTop: 12 }}>Preparing your prayer times…</Text>
       </LinearGradient>
     );
   }
@@ -242,11 +134,7 @@ export default function App() {
   return (
     <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: 80 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
           {/* 📍 Localisation */}
           <View style={{ alignItems: "center", marginTop: 10, marginBottom: 12 }}>
             <View
@@ -260,40 +148,16 @@ export default function App() {
               }}
             >
               <Text style={{ color: CARD.text, fontSize: 14, fontWeight: "700" }}>
-                <Text style={{ opacity: 0.85 }}>📍</Text>{" "}
-                {coords?.prettyCity ?? "Unknown"}
+                <Text style={{ opacity: 0.85 }}>📍</Text> {coords?.prettyCity ?? "Unknown"}
               </Text>
             </View>
           </View>
 
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
-            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>
-              MySalat
-            </Text>
-            <Text style={{ color: CARD.sub, marginTop: 4 }}>
-              26x
-            </Text>
+            <Text style={{ color: CARD.text, fontSize: 28, fontWeight: "800" }}>MySalat</Text>
+            <Text style={{ color: CARD.sub, marginTop: 4 }}>@yanis26x</Text>
           </View>
-
-          {/* 🔔 Bouton test notif */}
-          <Pressable
-            onPress={testNotification}
-            style={{
-              alignSelf: "center",
-              backgroundColor: "rgba(59, 130, 246, 0.15)",
-              borderColor: CARD.accent,
-              borderWidth: 1,
-              paddingVertical: 10,
-              paddingHorizontal: 16,
-              borderRadius: 12,
-              marginBottom: 16,
-            }}
-          >
-            <Text style={{ color: CARD.accent, fontWeight: "700" }}>
-              Tester les notifs!
-            </Text>
-          </Pressable>
 
           {/* Card: Next prayer */}
           <View
@@ -308,28 +172,14 @@ export default function App() {
           >
             {nextInfo ? (
               <>
-                <Text style={{ color: CARD.sub, marginBottom: 6 }}>
-                  Next prayer
-                </Text>
-                <Text
-                  style={{
-                    color: CARD.text,
-                    fontSize: 22,
-                    fontWeight: "700",
-                    marginBottom: 4,
-                  }}
-                >
+                <Text style={{ color: CARD.sub, marginBottom: 6 }}>Next prayer</Text>
+                <Text style={{ color: CARD.text, fontSize: 22, fontWeight: "700", marginBottom: 4 }}>
                   {nextInfo.key.toUpperCase()} · {format(nextInfo.at, "HH:mm")}
                 </Text>
-                <Text style={{ color: CARD.accent, fontSize: 16 }}>
-                  Starts in {fmtCountdown(nextInfo.at)}
-                </Text>
+                <Text style={{ color: CARD.accent, fontSize: 16 }}>Starts in {fmtCountdown(nextInfo.at)}</Text>
               </>
             ) : (
-              <Text style={{ color: CARD.sub }}>
-                All prayers passed for today. You’re scheduled for the next
-                days.
-              </Text>
+              <Text style={{ color: CARD.sub }}>All prayers passed for today. You’re scheduled for the next days.</Text>
             )}
           </View>
 
@@ -356,100 +206,23 @@ export default function App() {
                     borderBottomWidth: 1,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: CARD.text,
-                      fontSize: 16,
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {k}
-                  </Text>
-                  <Text style={{ color: CARD.text, fontSize: 16 }}>
-                    {format(todayTimes[k], "HH:mm")}
-                  </Text>
+                  <Text style={{ color: CARD.text, fontSize: 16, textTransform: "capitalize" }}>{k}</Text>
+                  <Text style={{ color: CARD.text, fontSize: 16 }}>{format(todayTimes[k], "HH:mm")}</Text>
                 </View>
               ))
             ) : (
-              <Text style={{ color: "#fca5a5" }}>
-                Failed to compute prayer times.
-              </Text>
-            )}
-          </View>
-
-          {/* Qibla section */}
-          <View
-            style={{
-              backgroundColor: CARD.bg,
-              borderColor: CARD.border,
-              borderWidth: 1,
-              padding: 16,
-              borderRadius: 16,
-              marginTop: 16,
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: CARD.sub, marginBottom: 10 }}>
-              Qibla direction
-            </Text>
-
-            <View
-              style={{
-                width: 180,
-                height: 180,
-                borderRadius: 90,
-                borderWidth: 1,
-                borderColor: CARD.border,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {/* Flèche */}
-              <View
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderLeftWidth: 10,
-                  borderRightWidth: 10,
-                  borderBottomWidth: 60,
-                  borderLeftColor: "transparent",
-                  borderRightColor: "transparent",
-                  borderBottomColor: isFacingQibla ? CARD.success : CARD.accent, // 💚 vert si aligné
-                  transform: [{ rotate: `${arrowAngle}deg` }, { translateY: -10 }],
-                }}
-              />
-            </View>
-
-            <Text style={{ color: CARD.text, marginTop: 12, fontSize: 16 }}>
-              {isFacingQibla
-                ? "✅ You're facing the Qibla!"
-                : qibla != null
-                ? `Face toward: ${Math.round(qibla)}°`
-                : "—"}
-            </Text>
-            {!isFacingQibla && (
-              <Text style={{ color: CARD.sub, marginTop: 4, fontSize: 13 }}>
-                Turn your phone until the arrow points up to face the Qibla.
-              </Text>
+              <Text style={{ color: "#fca5a5" }}>Failed to compute prayer times.</Text>
             )}
           </View>
 
           {/* Footer */}
           <View style={{ marginTop: 30, alignItems: "center" }}>
-            <Text style={{ color: CARD.sub, fontSize: 13, opacity: 0.9 }}>
+            {/* <Text style={{ color: CARD.sub, fontSize: 13, opacity: 0.9 }}>
               Notifications enabled · {scheduledCount} reminders set
-            </Text>
+            </Text> */}
 
-            <Pressable onPress={openInstagram}>
-              <Text
-                style={{
-                  color: CARD.accent,
-                  fontSize: 14,
-                  fontWeight: "700",
-                  marginTop: 8,
-                  letterSpacing: 0.5,
-                }}
-              >
+            <Pressable onPress={() => Linking.openURL("https://www.instagram.com/yanis26x")}>
+              <Text style={{ color: CARD.accent, fontSize: 14, fontWeight: "700", marginTop: 8, letterSpacing: 0.5 }}>
                 © 2025 @yanis26x
               </Text>
             </Pressable>
@@ -457,5 +230,41 @@ export default function App() {
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
+  );
+}
+
+/* ---------- APP (Tabs) ---------- */
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarActiveTintColor: CARD.accent,
+          tabBarInactiveTintColor: CARD.sub,
+          tabBarStyle: {
+            backgroundColor: CARD.bg,
+            borderTopColor: CARD.border,
+            borderTopWidth: 1,
+          },
+          tabBarIcon: ({ color, size, focused }) => {
+            if (route.name === "Home") {
+              return <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />;
+            }
+            if (route.name === "Qibla") {
+              return <Ionicons name={focused ? "compass" : "compass-outline"} size={size} color={color} />;
+            }
+            if (route.name === "Notes") {
+              return <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />;
+            }
+            return null;
+          },
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Qibla" component={QiblaScreen} />
+        <Tab.Screen name="Notes" component={NotesScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
