@@ -7,10 +7,9 @@ npm i
 
 npm start
 ```
-<p align="center">© 2025 <b>yanis26x</b> · MySalat App</p>
 
 # Licence
 Ce projet est sous licence Creative Commons Attribution - Pas d’Utilisation Commerciale 4.0 International (CC BY-NC 4.0).
 Vous pouvez le consulter, le partager et le modifier, tant que vous créditez l’auteur (yanis26x) et que vous n’en faites pas un usage commercial.
 #
-© 2025 yanis26x – Tous droits réservés
+<p align="center">© 2025 <b>yanis26x</b> · Tous droits réservés</p>
