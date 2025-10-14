@@ -10,8 +10,11 @@ Mais, il reste **quelques ajustements** avant la mise en ligne officielle :
 - Le **schéma de couleurs** est encore provisoire — il sera ajusté dans la version finale pour un rendu plus harmonieux.
 
 
-### No Demo
-[See on YouTube]()
+### Demo
+[See on YouTube](https://youtube.com/shorts/X3Ul-3ZSmvY?feature=share)
+
+![MySalatV2Show](https://github.com/yanis26x/MySalat/blob/main/assets/screen/MySalatV2Show.png)
+
 
 # how to install
 ```bash
