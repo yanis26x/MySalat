@@ -18,6 +18,7 @@ import { getPrayerTimesForDate } from "./src/prayerTimes";
 import { scheduleNextDays } from "./src/scheduler";
 import NotesScreen from "./src/screens/NotesScreen";
 import QiblaScreen from "./src/screens/QiblaScreen";
+import HowToScreen from "./src/screens/HowTo";
 
 // 🧭 Navigation
 import { NavigationContainer } from "@react-navigation/native";
@@ -238,33 +239,38 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarActiveTintColor: CARD.accent,
-          tabBarInactiveTintColor: CARD.sub,
-          tabBarStyle: {
-            backgroundColor: CARD.bg,
-            borderTopColor: CARD.border,
-            borderTopWidth: 1,
-          },
-          tabBarIcon: ({ color, size, focused }) => {
-            if (route.name === "Home") {
-              return <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />;
-            }
-            if (route.name === "Qibla") {
-              return <Ionicons name={focused ? "compass" : "compass-outline"} size={size} color={color} />;
-            }
-            if (route.name === "Notes") {
-              return <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />;
-            }
-            return null;
-          },
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Qibla" component={QiblaScreen} />
-        <Tab.Screen name="Notes" component={NotesScreen} />
-      </Tab.Navigator>
+  screenOptions={({ route }) => ({
+    headerShown: false,
+    tabBarActiveTintColor: CARD.accent,
+    tabBarInactiveTintColor: CARD.sub,
+    tabBarStyle: {
+      backgroundColor: CARD.bg,
+      borderTopColor: CARD.border,
+      borderTopWidth: 1,
+    },
+    tabBarIcon: ({ color, size, focused }) => {
+      if (route.name === "Home") {
+        return <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />;
+      }
+      if (route.name === "Qibla") {
+        return <Ionicons name={focused ? "compass" : "compass-outline"} size={size} color={color} />;
+      }
+      if (route.name === "Notes") {
+        return <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />;
+      }
+      if (route.name === "HowTo") {
+        return <Ionicons name={focused ? "help-circle" : "help-circle-outline"} size={size} color={color} />;
+      }
+      return null;
+    },
+  })}
+>
+  <Tab.Screen name="Home" component={HomeScreen} />
+  <Tab.Screen name="Qibla" component={QiblaScreen} />
+  <Tab.Screen name="Notes" component={NotesScreen} />
+  <Tab.Screen name="HowTo" component={HowToScreen} />
+</Tab.Navigator>
+
     </NavigationContainer>
   );
 }
