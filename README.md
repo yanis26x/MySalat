@@ -1,5 +1,7 @@
 # MySalat
 Minimalist mobile app that automatically notifies users of upcoming prayer times based on their location. Built with Expo &amp; React Native.
+#### 
+Pour augmenter mon taux de Hassanate
 
 # Realease
 L’application est **techniquement terminée** et prête à être publiée.
