@@ -3,14 +3,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, FlatList, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-const CARD = {
-  bg: "#0B0B0F",
-  text: "#FFFFFF",
-  sub: "#9CA3AF",
-  accent: "#3B82F6",
-  border: "#1a1a1a",
-};
+import { useTheme26x } from "../themeContext";
 
 const ASMA_UL_HUSNA = [
   { id: 1,  ar: "ٱللَّٰه", translit: "Allah",        meaning: "The Proper Name of God" },
@@ -42,6 +35,7 @@ const WUDU_STEPS = [
 ];
 
 export default function HowToScreen() {
+  const { THEME } = useTheme26x();
   const [mode, setMode] = useState("names"); // "names" | "wudu"
   const [query, setQuery] = useState("");
 
@@ -56,22 +50,20 @@ export default function HowToScreen() {
     );
   }, [query]);
 
-  // Header commun
   const Header = () => (
     <View style={{ alignItems: "center", marginBottom: 12 }}>
-      <Text style={{ color: CARD.text, fontSize: 26, fontWeight: "800" }}>How To</Text>
-      <Text style={{ color: CARD.sub, marginTop: 4 }}>Guides rapides pour apprendre et réviser</Text>
+      <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>How To</Text>
+      <Text style={{ color: THEME.sub, marginTop: 4 }}>Guides rapides pour apprendre et réviser</Text>
     </View>
   );
 
-  // Segmented control commun
   const Segmented = () => (
     <View
       style={{
         flexDirection: "row",
-        backgroundColor: CARD.bg,
+        backgroundColor: THEME.card,
         borderWidth: 1,
-        borderColor: CARD.border,
+        borderColor: THEME.border,
         borderRadius: 999,
         padding: 4,
         marginBottom: 16,
@@ -81,13 +73,13 @@ export default function HowToScreen() {
         onPress={() => setMode("names")}
         style={{
           flex: 1,
-          backgroundColor: mode === "names" ? CARD.accent : "transparent",
+          backgroundColor: mode === "names" ? THEME.accent : "transparent",
           paddingVertical: 10,
           borderRadius: 999,
           alignItems: "center",
         }}
       >
-        <Text style={{ color: mode === "names" ? "#fff" : CARD.sub, fontWeight: "700" }}>
+        <Text style={{ color: mode === "names" ? "#fff" : THEME.sub, fontWeight: "700" }}>
           99 Noms d’Allah
         </Text>
       </Pressable>
@@ -95,23 +87,23 @@ export default function HowToScreen() {
         onPress={() => setMode("wudu")}
         style={{
           flex: 1,
-          backgroundColor: mode === "wudu" ? CARD.accent : "transparent",
+          backgroundColor: mode === "wudu" ? THEME.accent : "transparent",
           paddingVertical: 10,
           borderRadius: 999,
           alignItems: "center",
         }}
       >
-        <Text style={{ color: mode === "wudu" ? "#fff" : CARD.sub, fontWeight: "700" }}>
+        <Text style={{ color: mode === "wudu" ? "#fff" : THEME.sub, fontWeight: "700" }}>
           Ablutions (Wudu)
         </Text>
       </Pressable>
     </View>
   );
 
-  // 🔹 MODE 1: FlatList SEULE (pas de ScrollView autour)
+  // MODE 1: FlatList seule
   if (mode === "names") {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <FlatList
           data={filteredNames}
           keyExtractor={(item) => String(item.id)}
@@ -123,11 +115,11 @@ export default function HowToScreen() {
             <View style={{ padding: 16, paddingBottom: 0 }}>
               <Header />
               <Segmented />
-              {/* Barre de recherche */}
+              {/* Search */}
               <View
                 style={{
-                  backgroundColor: CARD.bg,
-                  borderColor: CARD.border,
+                  backgroundColor: THEME.card,
+                  borderColor: THEME.border,
                   borderWidth: 1,
                   borderRadius: 12,
                   paddingHorizontal: 12,
@@ -138,13 +130,13 @@ export default function HowToScreen() {
                   gap: 8,
                 }}
               >
-                <Ionicons name="search" size={18} color={CARD.sub} />
+                <Ionicons name="search" size={18} color={THEME.sub} />
                 <TextInput
                   placeholder="Rechercher (arabe, translit, signification)…"
-                  placeholderTextColor={CARD.sub}
+                  placeholderTextColor={THEME.sub}
                   value={query}
                   onChangeText={setQuery}
-                  style={{ color: CARD.text, flex: 1, paddingVertical: 6 }}
+                  style={{ color: THEME.text, flex: 1, paddingVertical: 6 }}
                 />
               </View>
             </View>
@@ -152,26 +144,24 @@ export default function HowToScreen() {
           renderItem={({ item }) => (
             <View
               style={{
-                backgroundColor: CARD.bg,
+                backgroundColor: THEME.card,
                 borderTopWidth: 1,
-                borderTopColor: CARD.border,
+                borderTopColor: THEME.border,
                 paddingVertical: 12,
                 paddingHorizontal: 16,
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: CARD.text, fontSize: 16, fontWeight: "800" }}>{item.translit}</Text>
-                <Text style={{ color: CARD.accent, fontSize: 18 }}>{item.ar}</Text>
+                <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800" }}>{item.translit}</Text>
+                <Text style={{ color: THEME.accent, fontSize: 18 }}>{item.ar}</Text>
               </View>
-              <Text style={{ color: CARD.sub, marginTop: 4 }}>{item.meaning}</Text>
+              <Text style={{ color: THEME.sub, marginTop: 4 }}>{item.meaning}</Text>
             </View>
           )}
-          ListEmptyComponent={
-            <Text style={{ color: CARD.sub, padding: 16 }}>Aucun résultat.</Text>
-          }
+          ListEmptyComponent={<Text style={{ color: THEME.sub, padding: 16 }}>Aucun résultat.</Text>}
           ListFooterComponent={
             <View style={{ alignItems: "center", paddingVertical: 16 }}>
-              <Text style={{ color: CARD.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
+              <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
             </View>
           }
         />
@@ -179,23 +169,23 @@ export default function HowToScreen() {
     );
   }
 
-  // 🔹 MODE 2: ScrollView SEUL (aucune VirtualizedList dedans)
+  // MODE 2: ScrollView seule
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
         <Header />
         <Segmented />
 
         <View
           style={{
-            backgroundColor: CARD.bg,
-            borderColor: CARD.border,
+            backgroundColor: THEME.card,
+            borderColor: THEME.border,
             borderWidth: 1,
             borderRadius: 12,
             padding: 14,
           }}
         >
-          <Text style={{ color: CARD.text, fontSize: 18, fontWeight: "800", marginBottom: 8 }}>
+          <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800", marginBottom: 8 }}>
             Guide des ablutions (Wudu)
           </Text>
 
@@ -207,7 +197,7 @@ export default function HowToScreen() {
                 gap: 10,
                 paddingVertical: 10,
                 borderBottomWidth: idx === WUDU_STEPS.length - 1 ? 0 : 1,
-                borderBottomColor: CARD.border,
+                borderBottomColor: THEME.border,
               }}
             >
               <View
@@ -216,31 +206,31 @@ export default function HowToScreen() {
                   height: 28,
                   borderRadius: 999,
                   borderWidth: 1,
-                  borderColor: CARD.accent,
+                  borderColor: THEME.accent,
                   alignItems: "center",
                   justifyContent: "center",
                   marginTop: 2,
                 }}
               >
-                <Text style={{ color: CARD.accent, fontWeight: "800" }}>{idx + 1}</Text>
+                <Text style={{ color: THEME.accent, fontWeight: "800" }}>{idx + 1}</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: CARD.text, fontWeight: "800" }}>{s.title}</Text>
-                <Text style={{ color: CARD.sub, marginTop: 2 }}>{s.desc}</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>{s.title}</Text>
+                <Text style={{ color: THEME.sub, marginTop: 2 }}>{s.desc}</Text>
               </View>
             </View>
           ))}
 
           <View style={{ marginTop: 12, gap: 8 }}>
-            <Text style={{ color: CARD.sub, fontSize: 12 }}>
-              ℹ️ Ce guide résume les bases pratiquées par la majorité des écoles. Pour les cas
-              particuliers, réfère-toi à une source fiable.
+            <Text style={{ color: THEME.sub, fontSize: 12 }}>
+              ℹ️ Ce guide résume les bases pratiquées par la majorité des écoles. Pour les cas particuliers, réfère-toi
+              à une source fiable.
             </Text>
           </View>
         </View>
 
         <View style={{ alignItems: "center", marginTop: 16 }}>
-          <Text style={{ color: CARD.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
+          <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 yanis26x · Tous droits réservé</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

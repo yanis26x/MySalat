@@ -7,23 +7,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useIsFocused } from "@react-navigation/native";
 import { qiblaBearing } from "../qibla";
-
-const CARD = {
-  bg: "#0B0B0F",
-  text: "#FFFFFF",
-  sub: "#9CA3AF",
-  accent: "#3B82F6",
-  border: "#1a1a1a",
-  success: "#22c55e",
-};
+import { useTheme26x } from "../themeContext";
 
 const ALIGN_TOLERANCE_DEG = 10;
 
 export default function QiblaScreen() {
-  const isFocused = useIsFocused(); // ✅ actif seulement quand l'écran est affiché
+  const isFocused = useIsFocused();
+  const { THEME } = useTheme26x();
 
   const [loading, setLoading] = useState(true);
-  const [coords, setCoords] = useState(null);
   const [qibla, setQibla] = useState(null);
   const [heading, setHeading] = useState(0);
   const [isFacingQibla, setIsFacingQibla] = useState(false);
@@ -31,8 +23,8 @@ export default function QiblaScreen() {
 
   const soundRef = useRef(null);
   const headingSubRef = useRef(null);
-  const armedRef = useRef(false); // évite de jouer du son quand non focus
-  const lastAlignedRef = useRef(false); // pour ne pas spam le son
+  const armedRef = useRef(false);
+  const lastAlignedRef = useRef(false);
 
   // Charge le son une fois
   useEffect(() => {
@@ -45,9 +37,7 @@ export default function QiblaScreen() {
           staysActiveInBackground: false,
           shouldDuckAndroid: true,
         });
-        const { sound } = await Audio.Sound.createAsync(
-          require("../../assets/qibla-success.mp3")
-        );
+        const { sound } = await Audio.Sound.createAsync(require("../../assets/qibla-success.mp3"));
         if (mounted) soundRef.current = sound;
       } catch (e) {
         console.warn("Failed to load sound:", e);
@@ -60,13 +50,12 @@ export default function QiblaScreen() {
     };
   }, []);
 
-  // (Re)montage des capteurs UNIQUEMENT quand l'écran est focus
+  // (Re)montage des capteurs uniquement quand l'écran est focus
   useEffect(() => {
     let cancelled = false;
 
     const setupAsync = async () => {
       if (!isFocused) {
-        // 🔇 On désarme, on coupe le son, on enlève les subs
         armedRef.current = false;
         lastAlignedRef.current = false;
         setIsFacingQibla(false);
@@ -86,14 +75,9 @@ export default function QiblaScreen() {
           return;
         }
 
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        if (cancelled) return;
-
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
-        setCoords({ lat, lon });
 
         const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
         const prettyCity =
@@ -105,10 +89,7 @@ export default function QiblaScreen() {
         const qb = qiblaBearing(lat, lon);
         setQibla(qb);
 
-        // ✅ On arme la détection uniquement maintenant
         armedRef.current = true;
-
-        // ✅ On s'abonne à la boussole uniquement quand focus
         headingSubRef.current = await Location.watchHeadingAsync((h) => {
           const hdg =
             typeof h.trueHeading === "number" && !Number.isNaN(h.trueHeading)
@@ -129,7 +110,6 @@ export default function QiblaScreen() {
 
     setupAsync();
 
-    // Cleanup quand on quitte l'écran
     return () => {
       cancelled = true;
       armedRef.current = false;
@@ -140,7 +120,7 @@ export default function QiblaScreen() {
     };
   }, [isFocused]);
 
-  // Détection alignement (ne s'active que si l'écran est focus & armé)
+  // Détection alignement
   useEffect(() => {
     if (!isFocused || !armedRef.current || qibla == null) return;
 
@@ -150,7 +130,6 @@ export default function QiblaScreen() {
     if (aligned && !lastAlignedRef.current) {
       lastAlignedRef.current = true;
       setIsFacingQibla(true);
-      // 🔊 Joue le son une seule fois à l'alignement
       soundRef.current?.replayAsync().catch(() => {});
     } else if (!aligned && lastAlignedRef.current) {
       lastAlignedRef.current = false;
@@ -158,32 +137,26 @@ export default function QiblaScreen() {
     }
   }, [heading, qibla, isFocused]);
 
-  const arrowAngle = useMemo(
-    () => (qibla != null ? (qibla - heading + 360) % 360 : 0),
-    [qibla, heading]
-  );
+  const arrowAngle = useMemo(() => (qibla != null ? (qibla - heading + 360) % 360 : 0), [qibla, heading]);
 
   if (loading) {
     return (
-      <LinearGradient
-        colors={["#0a2472", "#000000"]}
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={{ color: CARD.sub, marginTop: 12 }}>Calibrating compass…</Text>
+      <LinearGradient colors={THEME.screenGradient} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={THEME.accent} />
+        <Text style={{ color: THEME.sub, marginTop: 12 }}>Calibrating compass…</Text>
       </LinearGradient>
     );
   }
 
   return (
-    <LinearGradient colors={["#0a2472", "#000000"]} style={{ flex: 1 }}>
+    <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ padding: 20, flex: 1, alignItems: "center" }}>
           {/* Ville */}
           <View
             style={{
-              backgroundColor: "rgba(255,255,255,0.06)",
-              borderColor: CARD.border,
+              backgroundColor: THEME.accentSoft,
+              borderColor: THEME.border,
               borderWidth: 1,
               paddingVertical: 6,
               paddingHorizontal: 14,
@@ -192,14 +165,10 @@ export default function QiblaScreen() {
               marginBottom: 14,
             }}
           >
-            <Text style={{ color: CARD.text, fontSize: 14, fontWeight: "700" }}>
-              📍 {city}
-            </Text>
+            <Text style={{ color: THEME.text, fontSize: 14, fontWeight: "700" }}>📍 {city}</Text>
           </View>
 
-          <Text style={{ color: CARD.text, fontSize: 24, fontWeight: "800", marginBottom: 12 }}>
-            Qibla direction
-          </Text>
+          <Text style={{ color: THEME.text, fontSize: 24, fontWeight: "800", marginBottom: 12 }}>Qibla direction</Text>
 
           {/* Boussole / Flèche */}
           <View
@@ -208,10 +177,11 @@ export default function QiblaScreen() {
               height: 200,
               borderRadius: 100,
               borderWidth: 1,
-              borderColor: CARD.border,
+              borderColor: THEME.border,
               alignItems: "center",
               justifyContent: "center",
               marginTop: 8,
+              backgroundColor: THEME.card,
             }}
           >
             <View
@@ -223,27 +193,23 @@ export default function QiblaScreen() {
                 borderBottomWidth: 70,
                 borderLeftColor: "transparent",
                 borderRightColor: "transparent",
-                borderBottomColor: isFacingQibla ? CARD.success : CARD.accent,
+                borderBottomColor: isFacingQibla ? THEME.success : THEME.accent,
                 transform: [{ rotate: `${arrowAngle}deg` }, { translateY: -10 }],
               }}
             />
           </View>
 
-          <Text style={{ color: CARD.text, marginTop: 14, fontSize: 16 }}>
-            {isFacingQibla
-              ? "✅ You're facing the Qibla!"
-              : qibla != null
-              ? `Face toward: ${Math.round(qibla)}°`
-              : "—"}
+          <Text style={{ color: THEME.text, marginTop: 14, fontSize: 16 }}>
+            {isFacingQibla ? "✅ You're facing the Qibla!" : qibla != null ? `Face toward: ${Math.round(qibla)}°` : "—"}
           </Text>
           {!isFacingQibla && (
-            <Text style={{ color: CARD.sub, marginTop: 6, fontSize: 13, textAlign: "center" }}>
+            <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 13, textAlign: "center" }}>
               Turn your phone until the arrow points up to face the Qibla.
             </Text>
           )}
-          <Text style={{ color: CARD.accent, fontSize: 14, fontWeight: "700", marginTop: 8, letterSpacing: 0.5 }}>
-                          © 2025 @yanis26x · Tous droits réservé
-                        </Text>
+          <Text style={{ color: THEME.accent, fontSize: 14, fontWeight: "700", marginTop: 8, letterSpacing: 0.5 }}>
+            © 2025 @yanis26x · Tous droits réservé
+          </Text>
         </View>
       </SafeAreaView>
     </LinearGradient>
