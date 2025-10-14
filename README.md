@@ -9,8 +9,6 @@ Toutes les principales fonctionnalités sont fonctionnelles
 
 Mais, il reste **quelques ajustements** avant la mise en ligne officielle :
 - L’intégration des **publicités AdMob** n’est pas encore terminée (le module est installé, mais j’ai besoin d’aide pour la configuration finale).
-- Le **schéma de couleurs** est encore provisoire — il sera ajusté dans la version finale pour un rendu plus harmonieux.
-
 
 ### Demo
 [See on YouTube](https://youtube.com/shorts/X3Ul-3ZSmvY?feature=share)
