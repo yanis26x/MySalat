@@ -1,6 +1,15 @@
 // src/screens/NotesScreen.js
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable, Alert, Linking, Platform, Switch } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Alert,
+  Linking,
+  Platform,
+  Switch,
+} from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,9 +43,13 @@ function SectionHeader({ icon, title, subtitle }) {
     <View style={{ marginBottom: 12 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         <Ionicons name={icon} size={20} color={THEME.accent} />
-        <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>{title}</Text>
+        <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>
+          {title}
+        </Text>
       </View>
-      {subtitle ? <Text style={{ color: THEME.sub, marginTop: 4 }}>{subtitle}</Text> : null}
+      {subtitle ? (
+        <Text style={{ color: THEME.sub, marginTop: 4 }}>{subtitle}</Text>
+      ) : null}
     </View>
   );
 }
@@ -49,7 +62,10 @@ async function openExternal(urls) {
     }
     await Linking.openURL(urls.web);
   } catch {
-    Alert.alert("Ouverture impossible", "Vérifie que l’app ou le navigateur est disponible.");
+    Alert.alert(
+      "Ouverture impossible",
+      "Vérifie que l’app ou le navigateur est disponible."
+    );
   }
 }
 
@@ -58,17 +74,26 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
   // Permissions notifs + localisation
   const perm = await Notifications.requestPermissionsAsync();
   if (perm.status !== "granted") {
-    Alert.alert("Notifications désactivées", "Autorise les notifications pour recevoir les rappels.");
+    Alert.alert(
+      "Notifications désactivées",
+      "Autorise les notifications pour recevoir les rappels."
+    );
     return;
   }
 
-  const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
+  const { status: locStatus } =
+    await Location.requestForegroundPermissionsAsync();
   if (locStatus !== "granted") {
-    Alert.alert("Localisation requise", "Active la localisation pour calculer les horaires.");
+    Alert.alert(
+      "Localisation requise",
+      "Active la localisation pour calculer les horaires."
+    );
     return;
   }
 
-  const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+  const pos = await Location.getCurrentPositionAsync({
+    accuracy: Location.Accuracy.Balanced,
+  });
   const lat = pos.coords.latitude;
   const lon = pos.coords.longitude;
 
@@ -110,7 +135,10 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
     }
   }
 
-  Alert.alert("Rappels mis à jour", `Notifications planifiées selon tes préférences (${days} jours).`);
+  Alert.alert(
+    "Rappels mis à jour",
+    `Notifications planifiées selon tes préférences (${days} jours).`
+  );
 }
 
 export default function NotesScreen() {
@@ -156,7 +184,11 @@ export default function NotesScreen() {
   async function testNotification() {
     try {
       await Notifications.scheduleNotificationAsync({
-        content: { title: "🕌 Test Notification", body: "TEST26x - It's time to pray", sound: true },
+        content: {
+          title: "🕌 Test Notification",
+          body: "TEST26x - It's time to pray",
+          sound: true,
+        },
         trigger: { seconds: 5 },
       });
       Alert.alert("Ok", "Une notification de test arrive dans 5s.");
@@ -174,8 +206,16 @@ export default function NotesScreen() {
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
-            <Text style={{ color: THEME.text, fontSize: 28, fontWeight: "800" }}>Notes</Text>
-            <Text style={{ color: THEME.sub, marginTop: 6, textAlign: "center" }}>@yanis26x</Text>
+            <Text
+              style={{ color: THEME.text, fontSize: 28, fontWeight: "800" }}
+            >
+              Notes
+            </Text>
+            <Text
+              style={{ color: THEME.sub, marginTop: 6, textAlign: "center" }}
+            >
+              @yanis26x
+            </Text>
           </View>
 
           {/* ---------- SECTION NOTIFS PRIÈRES ---------- */}
@@ -207,13 +247,21 @@ export default function NotesScreen() {
                   borderTopColor: THEME.border,
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
                   <View
                     style={{
                       width: 10,
                       height: 10,
                       borderRadius: 999,
-                      backgroundColor: notifPrefs[k] ? THEME.accent : THEME.border,
+                      backgroundColor: notifPrefs[k]
+                        ? THEME.accent
+                        : THEME.border,
                     }}
                   />
                   <Text
@@ -249,7 +297,9 @@ export default function NotesScreen() {
                   backgroundColor: THEME.accent,
                 }}
               >
-                <Text style={{ color: "#fff", fontWeight: "800" }}>Tout activer</Text>
+                <Text style={{ color: "#fff", fontWeight: "800" }}>
+                  Tout activer
+                </Text>
               </Pressable>
 
               <Pressable
@@ -264,7 +314,9 @@ export default function NotesScreen() {
                   backgroundColor: THEME.surface,
                 }}
               >
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>Tout désactiver</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  Tout désactiver
+                </Text>
               </Pressable>
             </View>
 
@@ -281,11 +333,14 @@ export default function NotesScreen() {
                 backgroundColor: THEME.accentSoft,
               }}
             >
-              <Text style={{ color: THEME.accent, fontWeight: "800" }}>Replanifier maintenant (7 jours)</Text>
+              <Text style={{ color: THEME.accent, fontWeight: "800" }}>
+                Replanifier maintenant (7 jours)
+              </Text>
             </Pressable>
 
             <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 8 }}>
-              Astuce : tu peux tester une notification ci-dessous pour vérifier le son.
+              Astuce : tu peux tester une notification ci-dessous pour vérifier
+              le son.
             </Text>
           </View>
 
@@ -300,7 +355,11 @@ export default function NotesScreen() {
               marginBottom: 22,
             }}
           >
-            <SectionHeader icon="color-palette-outline" title="Thème" subtitle="Choisis le style de l’app" />
+            <SectionHeader
+              icon="color-palette-outline"
+              title="Thème"
+              subtitle="Choisis le style de l’app"
+            />
 
             {/* Grille de thèmes */}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
@@ -334,13 +393,44 @@ export default function NotesScreen() {
                     />
 
                     {/* titre dans la couleur du thème */}
-                    <Text style={{ color: t.accent, fontWeight: "800" }}>{t.label}</Text>
+                    <Text style={{ color: t.accent, fontWeight: "800" }}>
+                      {t.label}
+                    </Text>
 
                     {/* petites pastilles */}
-                    <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
-                      <View style={{ width: 16, height: 16, borderRadius: 4, backgroundColor: t.accent, borderWidth: 1, borderColor: THEME.border }} />
-                      <View style={{ width: 16, height: 16, borderRadius: 4, backgroundColor: t.card, borderWidth: 1, borderColor: THEME.border }} />
-                      <View style={{ width: 16, height: 16, borderRadius: 4, backgroundColor: t.appBg, borderWidth: 1, borderColor: THEME.border }} />
+                    <View
+                      style={{ flexDirection: "row", marginTop: 8, gap: 6 }}
+                    >
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: t.accent,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: t.card,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: t.appBg,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
                     </View>
 
                     {active && (
@@ -355,7 +445,15 @@ export default function NotesScreen() {
                           borderRadius: 999,
                         }}
                       >
-                        <Text style={{ color: "#fff", fontSize: 12, fontWeight: "800" }}>Actif</Text>
+                        <Text
+                          style={{
+                            color: "#fff",
+                            fontSize: 12,
+                            fontWeight: "800",
+                          }}
+                        >
+                          Actif
+                        </Text>
                       </View>
                     )}
                   </Pressable>
@@ -364,7 +462,8 @@ export default function NotesScreen() {
             </View>
 
             <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 12 }}>
-              Le thème est enregistré automatiquement et appliqué à tous les écrans.
+              Le thème est enregistré automatiquement et appliqué à tous les
+              écrans.
             </Text>
           </View>
 
@@ -384,11 +483,12 @@ export default function NotesScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader icon="information-circle-outline" title="Why MySalat ?" subtitle="26x" />
+            <SectionHeader
+              icon="information-circle-outline"
+              title="Why MySalat ?"
+            />
             <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
-              MySalat is a modern and minimalist mobile app built with React Native (Expo) that helps you stay connected
-              to your faith.{"\n\n"}It automatically detects your location to display accurate prayer times, shows the
-              Qibla direction, and sends smart notifications before each prayer — all wrapped in a clean, elegant design.
+              Pour augmenter mon taux de Hassanate
             </Text>
           </View>
 
@@ -408,7 +508,11 @@ export default function NotesScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader icon="heart-outline" title="Follow me" subtitle="Let’s connect" />
+            <SectionHeader
+              icon="heart-outline"
+              title="Follow me"
+              subtitle="Let’s connect"
+            />
 
             {/* Instagram */}
             <Pressable
@@ -435,7 +539,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-instagram" size={22} color={THEME.text} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: THEME.text, fontWeight: "700" }}>Instagram</Text>
+                <Text style={{ color: THEME.text, fontWeight: "700" }}>
+                  Instagram
+                </Text>
                 <Text style={{ color: THEME.sub }}>@{INSTAGRAM_USER}</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={THEME.sub} />
@@ -443,7 +549,9 @@ export default function NotesScreen() {
 
             {/* GitHub */}
             <Pressable
-              onPress={() => openExternal({ web: `https://github.com/${GITHUB_USER}` })}
+              onPress={() =>
+                openExternal({ web: `https://github.com/${GITHUB_USER}` })
+              }
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -458,7 +566,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-github" size={22} color={THEME.text} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: THEME.text, fontWeight: "700" }}>GitHub</Text>
+                <Text style={{ color: THEME.text, fontWeight: "700" }}>
+                  GitHub
+                </Text>
                 <Text style={{ color: THEME.sub }}>@{GITHUB_USER}</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={THEME.sub} />
@@ -480,7 +590,9 @@ export default function NotesScreen() {
             >
               <Ionicons name="logo-linkedin" size={22} color={THEME.accent} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: THEME.text, fontWeight: "700" }}>LinkedIn</Text>
+                <Text style={{ color: THEME.text, fontWeight: "700" }}>
+                  LinkedIn
+                </Text>
                 <Text style={{ color: THEME.sub }}>@yanis26x</Text>
               </View>
               <Ionicons name="open-outline" size={18} color={THEME.sub} />
@@ -498,7 +610,11 @@ export default function NotesScreen() {
               marginBottom: 10,
             }}
           >
-            <SectionHeader icon="construct-outline" title="Dev tools" subtitle="Outils internes pendant le dev" />
+            <SectionHeader
+              icon="construct-outline"
+              title="Dev tools"
+              subtitle="Outils internes pendant le dev"
+            />
             <Pressable
               onPress={testNotification}
               style={{
@@ -511,12 +627,16 @@ export default function NotesScreen() {
                 borderRadius: 12,
               }}
             >
-              <Text style={{ color: THEME.accent, fontWeight: "700" }}>Tester les notifications</Text>
+              <Text style={{ color: THEME.accent, fontWeight: "700" }}>
+                Tester les notifications
+              </Text>
             </Pressable>
           </View>
 
           <View style={{ alignItems: "center", marginTop: 20 }}>
-            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 yanis26x · Tous droits réservé</Text>
+            <Text style={{ color: THEME.accent, fontWeight: "700" }}>
+              © 2025 yanis26x · Tous droits réservé
+            </Text>
           </View>
         </ScrollView>
       </SafeAreaView>
