@@ -3,6 +3,13 @@ Minimalist mobile app that automatically notifies users of upcoming prayer times
 #### 
 Pour augmenter mon taux de Hassanate
 
+# Fonctionnalités
+- Heures et notifications des prières
+- Direction de la Mecque (Qibla)
+- Plusieurs thèmes
+- Les 99 noms d’Allah
+- Guide des ablutions (wudu)
+
 # Realease
 L’application est **techniquement terminée** et prête à être publiée.
 Toutes les principales fonctionnalités sont fonctionnelles
