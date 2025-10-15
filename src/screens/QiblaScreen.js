@@ -1,5 +1,6 @@
+// src/screens/QiblaScreen.js
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, ActivityIndicator, Alert } from "react-native";
+import { View, Text, ActivityIndicator, Alert, Modal, Pressable, ScrollView } from "react-native";
 import * as Location from "expo-location";
 import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,6 +21,7 @@ export default function QiblaScreen() {
   const [heading, setHeading] = useState(0);
   const [isFacingQibla, setIsFacingQibla] = useState(false);
   const [city, setCity] = useState("Unknown");
+  const [whyOpen, setWhyOpen] = useState(false);
 
   const soundRef = useRef(null);
   const headingSubRef = useRef(null);
@@ -37,9 +39,7 @@ export default function QiblaScreen() {
           staysActiveInBackground: false,
           shouldDuckAndroid: true,
         });
-        const { sound } = await Audio.Sound.createAsync(
-          require("../../assets/qibla-success.mp3")
-        );
+        const { sound } = await Audio.Sound.createAsync(require("../../assets/qibla-success.mp3"));
         if (mounted) soundRef.current = sound;
       } catch (e) {
         console.warn("Failed to load sound:", e);
@@ -141,17 +141,11 @@ export default function QiblaScreen() {
     }
   }, [heading, qibla, isFocused]);
 
-  const arrowAngle = useMemo(
-    () => (qibla != null ? (qibla - heading + 360) % 360 : 0),
-    [qibla, heading]
-  );
+  const arrowAngle = useMemo(() => (qibla != null ? (qibla - heading + 360) % 360 : 0), [qibla, heading]);
 
   if (loading) {
     return (
-      <LinearGradient
-        colors={THEME.screenGradient}
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
+      <LinearGradient colors={THEME.screenGradient} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" color={THEME.accent} />
         <Text style={{ color: THEME.sub, marginTop: 12 }}>Calibrating compass…</Text>
       </LinearGradient>
@@ -268,12 +262,7 @@ export default function QiblaScreen() {
                   size={16}
                   color={isFacingQibla ? THEME.success : THEME.sub}
                 />
-                <Text
-                  style={{
-                    color: isFacingQibla ? THEME.success : THEME.text,
-                    fontWeight: "800",
-                  }}
-                >
+                <Text style={{ color: isFacingQibla ? THEME.success : THEME.text, fontWeight: "800" }}>
                   {isFacingQibla ? "Aligné avec la Qibla" : "Tourne-toi vers la Qibla"}
                 </Text>
               </View>
@@ -305,20 +294,95 @@ export default function QiblaScreen() {
             </Text>
           </View>
 
-          {/* Footer */}
-          <View style={{ alignItems: "center", marginTop: 16 }}>
-            <Text
+          {/* Bouton explication */}
+          <View style={{ alignItems: "center", marginTop: 18 }}>
+            <Pressable
+              onPress={() => setWhyOpen(true)}
               style={{
-                color: THEME.accent,
-                fontSize: 12,
-                fontWeight: "700",
-                letterSpacing: 0.4,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                paddingVertical: 10,
+                paddingHorizontal: 14,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: THEME.border,
+                backgroundColor: THEME.card,
               }}
             >
+              <Ionicons name="information-circle-outline" size={18} color={THEME.accent} />
+              <Text style={{ color: THEME.text, fontWeight: "800" }}>Pourquoi la Qibla ?</Text>
+            </Pressable>
+          </View>
+
+          {/* Footer */}
+          <View style={{ alignItems: "center", marginTop: 16 }}>
+            <Text style={{ color: THEME.accent, fontSize: 12, fontWeight: "700", letterSpacing: 0.4 }}>
               © 2025 @yanis26x
             </Text>
           </View>
         </View>
+
+        {/* MODAL: Pourquoi la Qibla ? */}
+        <Modal visible={whyOpen} animationType="slide" transparent onRequestClose={() => setWhyOpen(false)}>
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "flex-end" }}>
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: THEME.card,
+                borderTopLeftRadius: 18,
+                borderTopRightRadius: 18,
+                borderColor: THEME.border,
+                borderTopWidth: 1,
+                paddingBottom: 20,
+                maxHeight: "70%",
+              }}
+            >
+              {/* Handle */}
+              <View style={{ alignItems: "center", paddingTop: 8 }}>
+                <View style={{ width: 44, height: 4, borderRadius: 999, backgroundColor: THEME.border }} />
+              </View>
+
+              <ScrollView contentContainerStyle={{ padding: 16 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <Ionicons name="book-outline" size={20} color={THEME.accent} />
+                  <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>
+                    Pourquoi prie-t-on vers la Qibla ?
+                  </Text>
+                </View>
+
+                <Text style={{ color: THEME.text, marginTop: 6 }}>
+                  • <Text style={{ fontWeight: "800" }}>Qibla</Text> = direction de la{" "}
+                  <Text style={{ fontWeight: "800" }}>Kaaba</Text> à La Mecque.{"\n"}
+                  • C’est un <Text style={{ fontWeight: "800" }}>ordre divin</Text> pour l’unité des musulmans (voir{" "}
+                  <Text style={{ fontStyle: "italic" }}>Coran 2:144</Text> et <Text style={{ fontStyle: "italic" }}>2:150</Text>).{"\n"}
+                  • Elle <Text style={{ fontWeight: "800" }}>rassemble</Text> les cœurs : où que l’on soit, on se tourne ensemble vers la même maison sacrée.{"\n"}
+                  • Elle aide à la <Text style={{ fontWeight: "800" }}>concentration</Text> pendant la prière.{"\n"}
+                  • Si on fait de son mieux pour l’estimer et qu’on se trompe, la prière reste{" "}
+                  <Text style={{ fontWeight: "800" }}>valide</Text> selon la majorité des savants.
+                </Text>
+
+                <View style={{ alignItems: "flex-end", marginTop: 16 }}>
+                  <Pressable
+                    onPress={() => setWhyOpen(false)}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      paddingVertical: 10,
+                      paddingHorizontal: 16,
+                      borderRadius: 12,
+                      backgroundColor: THEME.accent,
+                    }}
+                  >
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                    <Text style={{ color: "#fff", fontWeight: "800" }}>Compris</Text>
+                  </Pressable>
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </LinearGradient>
   );
