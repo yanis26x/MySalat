@@ -397,7 +397,7 @@ function HomeScreen() {
               </Pressable>
 
               <Pressable
-                onPress={() => navigation.navigate("HowTo")}
+                onPress={() => navigation.navigate("Learn", { initialMode: "howto" })}
                 style={{
                   flex: 1,
                   backgroundColor: THEME.card,
@@ -422,7 +422,7 @@ function HomeScreen() {
 
               <Pressable
                 onPress={() =>
-                  navigation.navigate("HowTo", { initialMode: "dua" })
+                  navigation.navigate("Learn", { initialMode: "dua" })
                 }
                 style={{
                   flex: 1,
