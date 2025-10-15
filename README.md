@@ -11,10 +11,13 @@ Pour augmenter mon taux de Hassanate
 - Guide des ablutions (wudu)
 
 # Realease
-L’application est **techniquement terminée** et prête à être publiée.
-Toutes les principales fonctionnalités sont fonctionnelles
+L’application est **techniquement pas encore publiée officiellement sur l’App Store** mais tu peux déjà la tester sur ton téléphone !
+# SCANE LE QR CODE POUR INSTALLER L’APP SUR TON TÉLÉPHONE !! (Installe Expo Go sur l’App Store dabord)
+![QRCODE](https://github.com/yanis26x/yanis26x/blob/index/OST_IMG/QrcodeMySalat.png) 
+#
+https://expo.dev/preview/update?message=cleanup&updateRuntimeVersion=1.0.0&createdAt=2025-10-15T18%3A49%3A27.552Z&slug=exp&projectId=c0003c16-6c9e-414f-817e-4a7278303424&group=40bc1e19-90aa-4458-a4e6-613c2ca97802
 
-Mais, il reste **quelques ajustements** avant la mise en ligne officielle :
+## il reste **quelques ajustements** avant la mise en ligne officielle :
 - L’intégration des **publicités AdMob** n’est pas encore terminée (le module est installé, mais j’ai besoin d’aide pour la configuration finale).
 
 ### Demo
