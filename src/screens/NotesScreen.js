@@ -17,9 +17,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme26x } from "../themeContext";
-
-// 👉 si tu préfères utiliser ton scheduler central, tu peux le réimporter et l'adapter :
-// import { scheduleNextDays } from "../scheduler";
 import { getPrayerTimesForDate } from "../prayerTimes";
 
 const INSTAGRAM_USER = "yanis26x";
@@ -209,7 +206,7 @@ export default function NotesScreen() {
             <Text
               style={{ color: THEME.text, fontSize: 28, fontWeight: "800" }}
             >
-              Notes
+              Paramètres
             </Text>
             <Text
               style={{ color: THEME.sub, marginTop: 6, textAlign: "center" }}
@@ -339,8 +336,7 @@ export default function NotesScreen() {
             </Pressable>
 
             <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 8 }}>
-              Astuce : tu peux tester une notification ci-dessous pour vérifier
-              le son.
+              Lève-toi pour Fajr, ne rate pas les autres prières non plus !
             </Text>
           </View>
 
@@ -489,6 +485,33 @@ export default function NotesScreen() {
             />
             <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
               Pour augmenter mon taux de Hassanate
+            </Text>
+          </View>
+
+          {/* ---------- A venir ---------- */}
+
+          <View
+            style={{
+              backgroundColor: THEME.card,
+              borderColor: THEME.border,
+              borderWidth: 1,
+              padding: 16,
+              borderRadius: 16,
+              marginBottom: 22,
+              shadowColor: "#000",
+              shadowOpacity: 0.08,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 4 },
+              elevation: 2,
+            }}
+          >
+            <SectionHeader
+              icon="information-circle-outline"
+              title="À venir.."
+            />
+            <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
+              Des publicités dans l'app pour financer le projet et payer les
+              serveurs. + une version web. + plein d'autres trucs !
             </Text>
           </View>
 
