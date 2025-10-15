@@ -1,12 +1,21 @@
 // src/screens/HowTo.js
 import React, { useMemo, useState, useEffect } from "react";
-import { View, Text, TextInput, Pressable, FlatList, ScrollView, Share } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  FlatList,
+  ScrollView,
+  Share,
+  Modal,
+  SafeAreaView,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme26x } from "../themeContext";
 
-/* ---------------- Asma ul Husna (extrait – colle ta liste complète si tu veux les 99) ---------------- */
+/* ---------------- Asma ul Husna (extrait – colle la liste complète si tu veux les 99) ---------------- */
 const ASMA_UL_HUSNA = [
   { id: 1,  ar: "ٱللَّٰه", translit: "Allah", meaning: "The Proper Name of God" },
   { id: 2,  ar: "الرَّحْمَٰن", translit: "Ar-Raḥmān", meaning: "The Entirely Merciful" },
@@ -109,8 +118,7 @@ const ASMA_UL_HUSNA = [
   { id: 99, ar: "الرَّشِيد", translit: "Ar-Rashīd", meaning: "The Guide to the Right Path" },
 ];
 
-
-/* ---------------- Wudu steps (on va les afficher en grosses cartes larges) ---------------- */
+/* ---------------- Wudu steps (grosses cartes) ---------------- */
 const WUDU_STEPS = [
   { k: "niyyah",    title: "Intention (Niyyah)", desc: "Avoir l’intention de faire wudu pour prier." },
   { k: "bismillah", title: "Bismillah",          desc: "Dire « Bismillah » avant de commencer." },
@@ -127,62 +135,13 @@ const WUDU_STEPS = [
 
 /* ---------------- DUA LIST (sélection) ---------------- */
 const DUA_LIST = [
-  {
-    id: "morning",
-    ar: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
-    tr: "Allahumma bika aṣbaḥnā wa bika amsaynā wa bika naḥyā wa bika namūtu wa ilayka-n-nushūr.",
-    fr: "Ô Allah, par Toi nous parvenons au matin et au soir, par Toi nous vivons et mourons, et vers Toi est la résurrection.",
-    ctx: "Dhikr du matin/soir",
-    src: "Tirmidhi"
-  },
-  {
-    id: "sleep",
-    ar: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-    tr: "Bismika Allahumma amūtu wa aḥyā.",
-    fr: "En Ton nom, ô Allah, je meurs et je vis.",
-    ctx: "Avant de dormir",
-    src: "Bukhari"
-  },
-  {
-    id: "travel",
-    ar: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
-    tr: "Subḥāna-lladhī sakhkhara lanā hādhā wa mā kunnā lahu muqrinīn wa innā ilā rabbinā lamunqalibūn.",
-    fr: "Gloire à Celui qui a soumis ceci à nous… et nous retournerons vers notre Seigneur.",
-    ctx: "Dua du voyage",
-    src: "Muslim"
-  },
-  {
-    id: "knowledge",
-    ar: "رَبِّ زِدْنِي عِلْمًا",
-    tr: "Rabbi zidnī ‘ilmā.",
-    fr: "Seigneur, augmente-moi en science.",
-    ctx: "Avant l’étude",
-    src: "Qur’ān 20:114"
-  },
-  {
-    id: "forgiveness",
-    ar: "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
-    tr: "Rabbana ẓalamnā anfusanā…",
-    fr: "Seigneur, nous nous sommes fait du tort…",
-    ctx: "Repentir (Adam)",
-    src: "Qur’ān 7:23"
-  },
-  {
-    id: "parents",
-    ar: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
-    tr: "Rabbi irḥamhumā kamā rabbayānī ṣaghīrā.",
-    fr: "Seigneur, fais-leur miséricorde comme ils m’ont élevé petit.",
-    ctx: "Dua pour les parents",
-    src: "Qur’ān 17:24"
-  },
-  {
-    id: "hearts",
-    ar: "يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ",
-    tr: "Yā muqalliba-l-qulūb, thabbit qalbī ‘alā dīnik.",
-    fr: "Ô Toi qui tournes les cœurs, affermis mon cœur sur Ta religion.",
-    ctx: "Fermeté du cœur",
-    src: "Tirmidhi"
-  },
+  { id: "morning", ar: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ", tr: "Allahumma bika aṣbaḥnā wa bika amsaynā wa bika naḥyā wa bika namūtu wa ilayka-n-nushūr.", fr: "Ô Allah, par Toi nous parvenons au matin et au soir, par Toi nous vivons et mourons, et vers Toi est la résurrection.", ctx: "Dhikr du matin/soir", src: "Tirmidhi" },
+  { id: "sleep",   ar: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", tr: "Bismika Allahumma amūtu wa aḥyā.", fr: "En Ton nom, ô Allah, je meurs et je vis.", ctx: "Avant de dormir", src: "Bukhari" },
+  { id: "travel",  ar: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ", tr: "Subḥāna-lladhī sakhkhara lanā hādhā wa mā kunnā lahu muqrinīn wa innā ilā rabbinā lamunqalibūn.", fr: "Gloire à Celui qui a soumis ceci à nous… et nous retournerons vers notre Seigneur.", ctx: "Dua du voyage", src: "Muslim" },
+  { id: "knowledge", ar: "رَبِّ زِدْنِي عِلْمًا", tr: "Rabbi zidnī ‘ilmā.", fr: "Seigneur, augmente-moi en science.", ctx: "Avant l’étude", src: "Qur’ān 20:114" },
+  { id: "forgiveness", ar: "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا...", tr: "Rabbana ẓalamnā anfusanā…", fr: "Seigneur, nous nous sommes fait du tort…", ctx: "Repentir (Adam)", src: "Qur’ān 7:23" },
+  { id: "parents", ar: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا", tr: "Rabbi irḥamhumā kamā rabbayānī ṣaghīrā.", fr: "Seigneur, fais-leur miséricorde comme ils m’ont élevé petit.", ctx: "Dua pour les parents", src: "Qur’ān 17:24" },
+  { id: "hearts", ar: "يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ", tr: "Yā muqalliba-l-qulūb, thabbit qalbī ‘alā dīnik.", fr: "Ô Toi qui tournes les cœurs, affermis mon cœur sur Ta religion.", ctx: "Fermeté du cœur", src: "Tirmidhi" },
 ];
 
 /* ---------------- 5 piliers de l’Islam ---------------- */
@@ -205,10 +164,228 @@ function todaySeed() {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 
+/* ---------------- Nouveau UI : SectionPicker (chips + modale grille) ---------------- */
+function SectionPicker({ mode, setMode, THEME, options }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return options;
+    return options.filter((o) => o.label.toLowerCase().includes(s));
+  }, [q, options]);
+
+  const head = options.slice(0, 5);
+
+  return (
+    <View style={{ marginBottom: 16 }}>
+      {/* Chips défilantes */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 8, paddingHorizontal: 4 }}
+        style={{
+          backgroundColor: THEME.card,
+          borderWidth: 1,
+          borderColor: THEME.border,
+          borderRadius: 16,
+          paddingVertical: 8,
+          paddingHorizontal: 8,
+        }}
+      >
+
+                {/* Bouton “Tout voir” */}
+        <Chip
+          label="Tout voir"
+          icon="grid-outline"
+          THEME={THEME}
+          onPress={() => setOpen(true)}
+        />
+        
+        {head.map((opt) => (
+          <Chip
+            key={opt.key}
+            active={mode === opt.key}
+            label={opt.label}
+            icon={opt.icon}
+            THEME={THEME}
+            onPress={() => setMode(opt.key)}
+          />
+        ))}
+
+        {/* Bouton “Tout voir” */}
+        <Chip
+          label="Tout voir"
+          icon="grid-outline"
+          THEME={THEME}
+          onPress={() => setOpen(true)}
+        />
+      </ScrollView>
+
+      {/* Hint du mode actif */}
+      <Text style={{ marginTop: 10, color: THEME.sub, fontSize: 12 }}>
+        Section actuelle :{" "}
+        <Text style={{ color: THEME.text, fontWeight: "700" }}>
+          {options.find((o) => o.key === mode)?.label ?? "—"}
+        </Text>
+      </Text>
+
+      {/* Modale grille */}
+      <Modal visible={open} animationType="slide" transparent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "flex-end",
+          }}
+        >
+          <SafeAreaView
+            style={{
+              backgroundColor: THEME.card,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 16,
+              borderTopWidth: 1,
+              borderColor: THEME.border,
+              maxHeight: "80%",
+              gap: 12,
+            }}
+          >
+            {/* Header */}
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>
+                Choisir une section
+              </Text>
+              <Pressable
+                onPress={() => setOpen(false)}
+                style={{
+                  padding: 8,
+                  borderRadius: 999,
+                  backgroundColor: THEME.bg,
+                  borderWidth: 1,
+                  borderColor: THEME.border,
+                }}
+              >
+                <Ionicons name="close" size={18} color={THEME.sub} />
+              </Pressable>
+            </View>
+
+            {/* Recherche */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                backgroundColor: THEME.bg,
+                borderWidth: 1,
+                borderColor: THEME.border,
+                borderRadius: 12,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+              }}
+            >
+              <Ionicons name="search" size={16} color={THEME.sub} />
+              <TextInput
+                placeholder="Rechercher une section…"
+                placeholderTextColor={THEME.sub}
+                value={q}
+                onChangeText={setQ}
+                style={{ color: THEME.text, flex: 1 }}
+              />
+              {q.length > 0 && (
+                <Pressable onPress={() => setQ("")}>
+                  <Ionicons name="close-circle" size={16} color={THEME.sub} />
+                </Pressable>
+              )}
+            </View>
+
+            {/* Grille (2 colonnes) */}
+            <FlatList
+              data={filtered}
+              keyExtractor={(item) => item.key}
+              numColumns={2}
+              columnWrapperStyle={{ gap: 12 }}
+              contentContainerStyle={{ paddingBottom: 12, gap: 12 }}
+              renderItem={({ item }) => (
+                <Tile
+                  label={item.label}
+                  icon={item.icon}
+                  active={mode === item.key}
+                  THEME={THEME}
+                  onPress={() => {
+                    setMode(item.key);
+                    setOpen(false);
+                  }}
+                />
+              )}
+            />
+          </SafeAreaView>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+function Chip({ label, icon, onPress, active, THEME }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      android_ripple={{ color: "transparent" }}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 999,
+        backgroundColor: active ? THEME.accent : THEME.bg,
+        borderWidth: 1,
+        borderColor: active ? THEME.accent : THEME.border,
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      {icon ? <Ionicons name={icon} size={14} color={active ? "#fff" : THEME.sub} /> : null}
+      <Text style={{ color: active ? "#fff" : THEME.sub, fontWeight: "700", fontSize: 13 }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function Tile({ label, icon = "ellipse-outline", active, onPress, THEME }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      android_ripple={{ color: "transparent" }}
+      style={{
+        flex: 1,
+        minHeight: 90,
+        backgroundColor: active ? THEME.accent : THEME.bg,
+        borderWidth: 1,
+        borderColor: active ? THEME.accent : THEME.border,
+        borderRadius: 16,
+        padding: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 8,
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      <Ionicons name={icon} size={22} color={active ? "#fff" : THEME.sub} />
+      <Text style={{ color: active ? "#fff" : THEME.text, textAlign: "center", fontWeight: "700", fontSize: 13 }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+/* ---------------- Écran principal ---------------- */
 export default function HowToScreen({ route }) {
   const { THEME } = useTheme26x();
 
-  // mode initial (permet d’ouvrir directement un onglet depuis ailleurs)
+  // mode initial
   const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua" | "pillars"
   const [mode, setMode] = useState(initial);
   useEffect(() => {
@@ -245,51 +422,22 @@ export default function HowToScreen({ route }) {
     } catch {}
   };
 
-  /* --------- UI components --------- */
+  /* --------- Header --------- */
   const Header = () => (
     <View style={{ alignItems: "center", marginBottom: 12 }}>
       <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Learn</Text>
-      <Text style={{ color: THEME.sub, marginTop: 4 }}>Guides rapides pour apprendre et réviser</Text>
+      <Text style={{ color: THEME.sub, marginTop: 4 }}>Fait glisser pour voir sections</Text>
     </View>
   );
 
-  const Segmented = () => (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: THEME.card,
-        borderWidth: 1,
-        borderColor: THEME.border,
-        borderRadius: 999,
-        padding: 4,
-        marginBottom: 16,
-      }}
-    >
-      {[
-        { key: "names", label: "99 Noms d’Allah" },
-        { key: "wudu", label: "Ablutions (Wudu)" },
-        { key: "dua", label: "Dua du jour" },
-        { key: "pillars", label: "5 Piliers" },
-      ].map((opt) => (
-        <Pressable
-          key={opt.key}
-          onPress={() => setMode(opt.key)}
-          android_ripple={{ color: "transparent" }}
-          style={{
-            flex: 1,
-            backgroundColor: mode === opt.key ? THEME.accent : "transparent",
-            paddingVertical: 10,
-            borderRadius: 999,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: mode === opt.key ? "#fff" : THEME.sub, fontWeight: "700" }}>
-            {opt.label}
-          </Text>
-        </Pressable>
-      ))}
-    </View>
-  );
+  /* --------- Options de la SectionPicker --------- */
+  const OPTIONS = [
+    { key: "names",   label: "99 Noms d’Allah",  icon: "sparkles-outline" },
+    { key: "wudu",    label: "Ablutions (Wudu)", icon: "water-outline" },
+    { key: "dua",     label: "Dua du jour",      icon: "sunny-outline" },
+    { key: "pillars", label: "5 Piliers",        icon: "albums-outline" },
+    // ➕ tu peux en ajouter plein d’autres ici
+  ];
 
   /* =======================
      MODE 1: NOMS (FlatList)
@@ -307,7 +455,7 @@ export default function HowToScreen({ route }) {
           ListHeaderComponent={
             <View style={{ padding: 16, paddingBottom: 0 }}>
               <Header />
-              <Segmented />
+              <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
               {/* Barre de recherche large */}
               <View
                 style={{
@@ -351,9 +499,7 @@ export default function HowToScreen({ route }) {
               <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 14 }}>{item.meaning}</Text>
             </View>
           )}
-          ListEmptyComponent={
-            <Text style={{ color: THEME.sub, padding: 16 }}>Aucun résultat.</Text>
-          }
+          ListEmptyComponent={<Text style={{ color: THEME.sub, padding: 16 }}>Aucun résultat.</Text>}
           ListFooterComponent={
             <View style={{ alignItems: "center", paddingVertical: 18 }}>
               <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
@@ -372,7 +518,7 @@ export default function HowToScreen({ route }) {
       <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
           <Header />
-          <Segmented />
+          <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
 
           <View style={{ gap: 12 }}>
             {WUDU_STEPS.map((s, idx) => (
@@ -407,19 +553,13 @@ export default function HowToScreen({ route }) {
                     marginTop: 2,
                   }}
                 >
-                  <Text style={{ color: THEME.accent, fontWeight: "900", fontSize: 16 }}>
-                    {idx + 1}
-                  </Text>
+                  <Text style={{ color: THEME.accent, fontWeight: "900", fontSize: 16 }}>{idx + 1}</Text>
                 </View>
 
                 {/* contenu */}
                 <View style={{ flex: 1 }}>
-                  <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>
-                    {s.title}
-                  </Text>
-                  <Text style={{ color: THEME.sub, marginTop: 6, lineHeight: 20, fontSize: 14 }}>
-                    {s.desc}
-                  </Text>
+                  <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>{s.title}</Text>
+                  <Text style={{ color: THEME.sub, marginTop: 6, lineHeight: 20, fontSize: 14 }}>{s.desc}</Text>
                 </View>
               </View>
             ))}
@@ -456,9 +596,9 @@ export default function HowToScreen({ route }) {
       <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
           <Header />
-          <Segmented />
+          <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
 
-          {/* Carte gradient Dua du jour plus large */}
+          {/* Carte gradient Dua du jour */}
           <LinearGradient
             colors={THEME.screenGradient}
             style={{
@@ -535,13 +675,13 @@ export default function HowToScreen({ route }) {
   }
 
   /* =======================
-     MODE 4: PILIERS (ScrollView) — section demandée
+     MODE 4: PILIERS (ScrollView)
      ======================= */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
         <Header />
-        <Segmented />
+        <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
 
         <View style={{ gap: 12 }}>
           {PILLARS.map((p, idx) => (
