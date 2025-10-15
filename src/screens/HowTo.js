@@ -6,7 +6,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme26x } from "../themeContext";
 
-/* ---------------- Asma ul Husna (extrait – tu peux coller ta liste complète) ---------------- */
+/* ---------------- Asma ul Husna (extrait – colle ta liste complète si tu veux les 99) ---------------- */
 const ASMA_UL_HUSNA = [
   { id: 1,  ar: "ٱللَّٰه", translit: "Allah",        meaning: "The Proper Name of God" },
   { id: 2,  ar: "الرَّحْمَٰن", translit: "Ar-Raḥmān",  meaning: "The Entirely Merciful" },
@@ -19,10 +19,9 @@ const ASMA_UL_HUSNA = [
   { id: 9,  ar: "الْعَزِيز", translit: "Al-‘Azīz",    meaning: "The All-Mighty" },
   { id: 10, ar: "الْجَبَّار", translit: "Al-Jabbār",  meaning: "The Compeller" },
   { id: 11, ar: "الْمُتَكَبِّر", translit: "Al-Mutakabbir", meaning: "The Supreme in Greatness" },
-  // 👉 colle ici ta liste complète si tu veux les 99
 ];
 
-/* ---------------- Wudu steps ---------------- */
+/* ---------------- Wudu steps (on va les afficher en grosses cartes larges) ---------------- */
 const WUDU_STEPS = [
   { k: "niyyah",    title: "Intention (Niyyah)", desc: "Avoir l’intention de faire wudu pour prier." },
   { k: "bismillah", title: "Bismillah",          desc: "Dire « Bismillah » avant de commencer." },
@@ -59,7 +58,7 @@ const DUA_LIST = [
     id: "travel",
     ar: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
     tr: "Subḥāna-lladhī sakhkhara lanā hādhā wa mā kunnā lahu muqrinīn wa innā ilā rabbinā lamunqalibūn.",
-    fr: "Gloire à Celui qui a soumis ceci à nous alors que nous n’en étions pas capables; et certes nous retournerons vers notre Seigneur.",
+    fr: "Gloire à Celui qui a soumis ceci à nous… et nous retournerons vers notre Seigneur.",
     ctx: "Dua du voyage",
     src: "Muslim"
   },
@@ -74,8 +73,8 @@ const DUA_LIST = [
   {
     id: "forgiveness",
     ar: "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
-    tr: "Rabbana ẓalamnā anfusanā wa in lam taghfir lanā wa tarḥamnā lanakūnanna mina-l-khāsirīn.",
-    fr: "Seigneur, nous nous sommes fait du tort; si Tu ne nous pardonnes pas et ne nous fais pas miséricorde, nous serons certes parmi les perdants.",
+    tr: "Rabbana ẓalamnā anfusanā…",
+    fr: "Seigneur, nous nous sommes fait du tort…",
     ctx: "Repentir (Adam)",
     src: "Qur’ān 7:23"
   },
@@ -97,6 +96,15 @@ const DUA_LIST = [
   },
 ];
 
+/* ---------------- 5 piliers de l’Islam ---------------- */
+const PILLARS = [
+  { k: "shahada", title: "Chahada (Profession de foi)", ar: "أشهد أن لا إله إلا الله وأشهد أن محمدًا رسول الله", fr: "Attester qu’il n’y a de divinité qu’Allah et que Muhammad est Son Messager.", desc: "Fondement de l’Islam.", icon: "ribbon-outline" },
+  { k: "salat",   title: "Salât (Prière)",               ar: "الصلاة", fr: "Cinq prières quotidiennes à leurs temps, vers la Qibla.", desc: "Discipline du cœur et du temps.", icon: "notifications-outline" },
+  { k: "zakat",   title: "Zakât (Aumône légale)",        ar: "الزكاة", fr: "Aumône purificatrice quand les conditions sont remplies.", desc: "Solidarité et purification.", icon: "cash-outline" },
+  { k: "sawm",    title: "Sawm (Jeûne du Ramadan)",      ar: "الصيام", fr: "Jeûner le mois de Ramadan de l’aube au coucher du soleil.", desc: "Éducation de l’âme et gratitude.", icon: "flame-outline" },
+  { k: "hajj",    title: "Hajj (Pèlerinage)",            ar: "الحج",   fr: "Pèlerinage à La Mecque une fois dans la vie si possible.", desc: "Unité de la Oumma.", icon: "airplane-outline" },
+];
+
 /* ---------------- Utils ---------------- */
 function seededPick(arr, seedNumber) {
   if (!arr?.length) return null;
@@ -111,8 +119,8 @@ function todaySeed() {
 export default function HowToScreen({ route }) {
   const { THEME } = useTheme26x();
 
-  // lecture du mode initial (pour ouvrir directement “dua” depuis la Home)
-  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua"
+  // mode initial (permet d’ouvrir directement un onglet depuis ailleurs)
+  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua" | "pillars"
   const [mode, setMode] = useState(initial);
   useEffect(() => {
     if (route?.params?.initialMode && route.params.initialMode !== mode) {
@@ -172,10 +180,12 @@ export default function HowToScreen({ route }) {
         { key: "names", label: "99 Noms d’Allah" },
         { key: "wudu", label: "Ablutions (Wudu)" },
         { key: "dua", label: "Dua du jour" },
+        { key: "pillars", label: "5 Piliers" },
       ].map((opt) => (
         <Pressable
           key={opt.key}
           onPress={() => setMode(opt.key)}
+          android_ripple={{ color: "transparent" }}
           style={{
             flex: 1,
             backgroundColor: mode === opt.key ? THEME.accent : "transparent",
@@ -209,19 +219,19 @@ export default function HowToScreen({ route }) {
             <View style={{ padding: 16, paddingBottom: 0 }}>
               <Header />
               <Segmented />
-              {/* Barre de recherche */}
+              {/* Barre de recherche large */}
               <View
                 style={{
                   backgroundColor: THEME.card,
                   borderColor: THEME.border,
                   borderWidth: 1,
-                  borderRadius: 12,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  marginBottom: 12,
+                  borderRadius: 14,
+                  paddingHorizontal: 14,
+                  paddingVertical: 10,
+                  marginBottom: 14,
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 10,
                 }}
               >
                 <Ionicons name="search" size={18} color={THEME.sub} />
@@ -230,7 +240,7 @@ export default function HowToScreen({ route }) {
                   placeholderTextColor={THEME.sub}
                   value={query}
                   onChangeText={setQuery}
-                  style={{ color: THEME.text, flex: 1, paddingVertical: 6 }}
+                  style={{ color: THEME.text, flex: 1, paddingVertical: 6, fontSize: 16 }}
                 />
               </View>
             </View>
@@ -241,22 +251,22 @@ export default function HowToScreen({ route }) {
                 backgroundColor: THEME.card,
                 borderTopWidth: 1,
                 borderTopColor: THEME.border,
-                paddingVertical: 12,
-                paddingHorizontal: 16,
+                paddingVertical: 14,
+                paddingHorizontal: 18,
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                 <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800" }}>{item.translit}</Text>
-                <Text style={{ color: THEME.accent, fontSize: 18 }}>{item.ar}</Text>
+                <Text style={{ color: THEME.accent, fontSize: 20 }}>{item.ar}</Text>
               </View>
-              <Text style={{ color: THEME.sub, marginTop: 4 }}>{item.meaning}</Text>
+              <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 14 }}>{item.meaning}</Text>
             </View>
           )}
           ListEmptyComponent={
             <Text style={{ color: THEME.sub, padding: 16 }}>Aucun résultat.</Text>
           }
           ListFooterComponent={
-            <View style={{ alignItems: "center", paddingVertical: 16 }}>
+            <View style={{ alignItems: "center", paddingVertical: 18 }}>
               <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
             </View>
           }
@@ -266,68 +276,82 @@ export default function HowToScreen({ route }) {
   }
 
   /* =======================
-     MODE 2: WUDU (ScrollView)
+     MODE 2: WUDU (ScrollView) — cartes larges et aérées
      ======================= */
   if (mode === "wudu") {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
           <Header />
           <Segmented />
+
+          <View style={{ gap: 12 }}>
+            {WUDU_STEPS.map((s, idx) => (
+              <View
+                key={s.k}
+                style={{
+                  backgroundColor: THEME.card,
+                  borderColor: THEME.border,
+                  borderWidth: 1,
+                  borderRadius: 16,
+                  padding: 16,
+                  flexDirection: "row",
+                  gap: 14,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.06,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 1,
+                }}
+              >
+                {/* pastille numéro plus grande */}
+                <View
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 21,
+                    borderWidth: 2,
+                    borderColor: THEME.accent,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: THEME.accentSoft,
+                    marginTop: 2,
+                  }}
+                >
+                  <Text style={{ color: THEME.accent, fontWeight: "900", fontSize: 16 }}>
+                    {idx + 1}
+                  </Text>
+                </View>
+
+                {/* contenu */}
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>
+                    {s.title}
+                  </Text>
+                  <Text style={{ color: THEME.sub, marginTop: 6, lineHeight: 20, fontSize: 14 }}>
+                    {s.desc}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
 
           <View
             style={{
               backgroundColor: THEME.card,
               borderColor: THEME.border,
               borderWidth: 1,
-              borderRadius: 12,
+              borderRadius: 14,
               padding: 14,
+              marginTop: 14,
             }}
           >
-            <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800", marginBottom: 8 }}>
-              Guide des ablutions (Wudu)
+            <Text style={{ color: THEME.sub, fontSize: 12 }}>
+              ℹ️ Résumé des bases pratiquées par la majorité des écoles. Pour les cas particuliers, réfère-toi à une source fiable.
             </Text>
-
-            {WUDU_STEPS.map((s, idx) => (
-              <View
-                key={s.k}
-                style={{
-                  flexDirection: "row",
-                  gap: 10,
-                  paddingVertical: 10,
-                  borderBottomWidth: idx === WUDU_STEPS.length - 1 ? 0 : 1,
-                  borderBottomColor: THEME.border,
-                }}
-              >
-                <View
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 999,
-                    borderWidth: 1,
-                    borderColor: THEME.accent,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: 2,
-                  }}
-                >
-                  <Text style={{ color: THEME.accent, fontWeight: "800" }}>{idx + 1}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ color: THEME.text, fontWeight: "800" }}>{s.title}</Text>
-                  <Text style={{ color: THEME.sub, marginTop: 2 }}>{s.desc}</Text>
-                </View>
-              </View>
-            ))}
-
-            <View style={{ marginTop: 12, gap: 8 }}>
-              <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                ℹ️ Ce guide résume les bases pratiquées par la majorité des écoles.
-              </Text>
-            </View>
           </View>
 
-          <View style={{ alignItems: "center", marginTop: 16 }}>
+          <View style={{ alignItems: "center", marginTop: 14 }}>
             <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
           </View>
         </ScrollView>
@@ -338,78 +362,131 @@ export default function HowToScreen({ route }) {
   /* =======================
      MODE 3: DUA (ScrollView)
      ======================= */
+  if (mode === "dua") {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
+          <Header />
+          <Segmented />
+
+          {/* Carte gradient Dua du jour plus large */}
+          <LinearGradient
+            colors={THEME.screenGradient}
+            style={{
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: THEME.border,
+              padding: 16,
+              marginBottom: 14,
+            }}
+          >
+            <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "900" }}>
+              Dua du jour — {dua?.ctx}
+            </Text>
+
+            <Text style={{ color: THEME.text, fontSize: 24, lineHeight: 34, marginTop: 10, textAlign: "right" }}>
+              {dua?.ar}
+            </Text>
+
+            <Text style={{ color: THEME.sub, marginTop: 12, fontStyle: "italic", fontSize: 14 }}>
+              {dua?.tr}
+            </Text>
+
+            <Text style={{ color: THEME.text, marginTop: 8, fontSize: 15 }}>
+              {dua?.fr}
+            </Text>
+
+            <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 12 }}>Source : {dua?.src}</Text>
+
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
+              <Pressable
+                onPress={pickRandomDua}
+                android_ripple={{ color: "transparent" }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 12,
+                  backgroundColor: THEME.accent,
+                }}
+              >
+                <Ionicons name="reload" size={18} color="#fff" />
+                <Text style={{ color: "#fff", fontWeight: "800" }}>Nouvelle dua</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={shareDua}
+                android_ripple={{ color: "transparent" }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: THEME.border,
+                  backgroundColor: THEME.card,
+                }}
+              >
+                <Ionicons name="share-social-outline" size={18} color={THEME.text} />
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>Partager</Text>
+              </Pressable>
+            </View>
+          </LinearGradient>
+
+          <View style={{ alignItems: "center", marginTop: 8 }}>
+            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  /* =======================
+     MODE 4: PILIERS (ScrollView) — section demandée
+     ======================= */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
         <Header />
         <Segmented />
 
-        {/* Carte gradient Dua du jour */}
-        <LinearGradient
-          colors={THEME.screenGradient}
-          style={{
-            borderRadius: 14,
-            borderWidth: 1,
-            borderColor: THEME.border,
-            padding: 14,
-            marginBottom: 12,
-          }}
-        >
-          <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800" }}>Dua du jour — {dua?.ctx}</Text>
-          {/* Arabe */}
-          <Text style={{ color: THEME.text, fontSize: 22, lineHeight: 32, marginTop: 8, textAlign: "right" }}>
-            {dua?.ar}
-          </Text>
-          {/* Translittération */}
-          <Text style={{ color: THEME.sub, marginTop: 10, fontStyle: "italic" }}>
-            {dua?.tr}
-          </Text>
-          {/* Français */}
-          <Text style={{ color: THEME.text, marginTop: 8 }}>
-            {dua?.fr}
-          </Text>
-          {/* Source */}
-          <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 12 }}>Source : {dua?.src}</Text>
-
-          {/* Actions */}
-          <View style={{ flexDirection: "row", gap: 10, marginTop: 12 }}>
-            <Pressable
-              onPress={pickRandomDua}
+        <View style={{ gap: 12 }}>
+          {PILLARS.map((p, idx) => (
+            <View
+              key={p.k}
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                borderRadius: 10,
-                backgroundColor: THEME.accent,
-              }}
-            >
-              <Ionicons name="reload" size={16} color="#fff" />
-              <Text style={{ color: "#fff", fontWeight: "800" }}>Nouvelle dua</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={shareDua}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: THEME.border,
                 backgroundColor: THEME.card,
+                borderColor: THEME.border,
+                borderWidth: 1,
+                borderRadius: 16,
+                padding: 16,
+                gap: 8,
               }}
             >
-              <Ionicons name="share-social-outline" size={16} color={THEME.text} />
-              <Text style={{ color: THEME.text, fontWeight: "800" }}>Partager</Text>
-            </Pressable>
-          </View>
-        </LinearGradient>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                <Ionicons name={p.icon} size={20} color={THEME.accent} />
+                <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "900" }}>
+                  {idx + 1}. {p.title}
+                </Text>
+              </View>
 
-        <View style={{ alignItems: "center", marginTop: 8 }}>
+              {p.ar ? (
+                <Text style={{ color: THEME.text, textAlign: "right", fontSize: 18 }}>
+                  {p.ar}
+                </Text>
+              ) : null}
+
+              <Text style={{ color: THEME.sub, fontSize: 15 }}>{p.fr}</Text>
+              <Text style={{ color: THEME.sub, fontSize: 12 }}>{p.desc}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={{ alignItems: "center", marginTop: 16 }}>
           <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
         </View>
       </ScrollView>
