@@ -1,3 +1,4 @@
+// App.js
 import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
@@ -132,7 +133,7 @@ function HomeScreen() {
     })();
   }, []);
 
-  // Trouver prochaine et précédente prière
+  // Trouver prochaine et précédente prière + progression
   const { nextInfo, prevInfo, progress } = useMemo(() => {
     if (!todayTimes) return { nextInfo: null, prevInfo: null, progress: 0 };
     const order = PRAYERS.map((k) => ({ key: k, at: todayTimes[k] })).sort((a, b) => a.at - b.at);
@@ -184,8 +185,8 @@ function HomeScreen() {
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-                {/* HEADER : Salam + Date + Localisation dessous */}
+        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+          {/* HEADER : Salam + Date + Localisation dessous */}
           <Section>
             <View style={{ alignItems: "center", marginBottom: 10 }}>
               {/* date */}
@@ -336,10 +337,30 @@ function HomeScreen() {
                 <Text style={{ color: THEME.text, fontWeight: "800" }}>How To</Text>
                 <Text style={{ color: THEME.sub, fontSize: 12 }}>Noms & Wudu</Text>
               </Pressable>
+
+              <Pressable
+                onPress={() => navigation.navigate("HowTo", { initialMode: "dua" })}
+                style={{
+                  flex: 1,
+                  backgroundColor: THEME.card,
+                  borderColor: THEME.border,
+                  borderWidth: 1,
+                  borderRadius: 14,
+                  paddingVertical: 14,
+                  paddingHorizontal: 12,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <Ionicons name="sparkles" size={20} color={THEME.accent} />
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>Dua du jour</Text>
+                <Text style={{ color: THEME.sub, fontSize: 12 }}>Invocation & partage</Text>
+              </Pressable>
             </View>
           </Section>
 
-          {/* LISTE DU JOUR (avec highlight prochaine) */}
+          {/* LISTE DU JOUR */}
           <Section>
             <Card THEME={THEME}>
               <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>

@@ -1,12 +1,12 @@
 // src/screens/HowTo.js
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, FlatList, ScrollView, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme26x } from "../themeContext";
 
-/* ---------------- Asma ul Husna (raccourcie pour l'exemple) ---------------- */
+/* ---------------- Asma ul Husna (extrait – tu peux coller ta liste complète) ---------------- */
 const ASMA_UL_HUSNA = [
   { id: 1,  ar: "ٱللَّٰه", translit: "Allah",        meaning: "The Proper Name of God" },
   { id: 2,  ar: "الرَّحْمَٰن", translit: "Ar-Raḥmān",  meaning: "The Entirely Merciful" },
@@ -19,7 +19,7 @@ const ASMA_UL_HUSNA = [
   { id: 9,  ar: "الْعَزِيز", translit: "Al-‘Azīz",    meaning: "The All-Mighty" },
   { id: 10, ar: "الْجَبَّار", translit: "Al-Jabbār",  meaning: "The Compeller" },
   { id: 11, ar: "الْمُتَكَبِّر", translit: "Al-Mutakabbir", meaning: "The Supreme in Greatness" },
-  // 👉 continue ta liste complète ici si tu veux (tu as déjà le fichier complet)
+  // 👉 colle ici ta liste complète si tu veux les 99
 ];
 
 /* ---------------- Wudu steps ---------------- */
@@ -37,13 +37,7 @@ const WUDU_STEPS = [
   { k: "tarteeb",   title: "Ordre & continuité", desc: "Respecter l’ordre et éviter les longues pauses." },
 ];
 
-/* ---------------- DUA LIST (sélection) ----------------
-   - arabe (ar)
-   - translittération (tr)
-   - traduction FR (fr)
-   - contexte (ctx)
-   - source (src) simple
-------------------------------------------------------- */
+/* ---------------- DUA LIST (sélection) ---------------- */
 const DUA_LIST = [
   {
     id: "morning",
@@ -78,46 +72,6 @@ const DUA_LIST = [
     src: "Qur’ān 20:114"
   },
   {
-    id: "istighfar",
-    ar: "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ ...",
-    tr: "Allāhumma anta rabbī lā ilāha illā anta, khalaqtanī wa anā ‘abduka ...",
-    fr: "Seigneur, Tu es mon Seigneur, nul dieu hormis Toi; Tu m’as créé et je suis Ton serviteur... (Sayyid al-Istighfâr).",
-    ctx: "Pardon complet",
-    src: "Bukhari"
-  },
-  {
-    id: "distress",
-    ar: "لا إِلَهَ إِلاَّ اللَّهُ الْعَظِيمُ الْحَلِيمُ ...",
-    tr: "Lā ilāha illā-llāhu al-‘aẓīmu al-ḥalīm ...",
-    fr: "Il n’y a de divinité qu’Allah, l’Immense, le Clément…",
-    ctx: "Tristesse / difficulté",
-    src: "Bukhari"
-  },
-  {
-    id: "guidance",
-    ar: "اللَّهُمَّ اهْدِنِي وَسَدِّدْنِي",
-    tr: "Allāhumma ihdinī wa saddidnī.",
-    fr: "Ô Allah, guide-moi et affermis-moi.",
-    ctx: "Guidance",
-    src: "Muslim"
-  },
-  {
-    id: "home-enter",
-    ar: "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
-    tr: "Bismi-llāhi walajnā wa bismi-llāhi kharajnā wa ‘alā-llāhi rabbinā tawakkalnā.",
-    fr: "Au nom d’Allah nous entrons, au nom d’Allah nous sortons, et en Allah, notre Seigneur, nous plaçons notre confiance.",
-    ctx: "Entrer/sortir de la maison",
-    src: "Abu Dawud"
-  },
-  {
-    id: "eating",
-    ar: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَأَطْعِمْنَا خَيْرًا مِنْهُ",
-    tr: "Allāhumma bārik lanā fīhi wa aṭ‘imnā khayran minhu.",
-    fr: "Ô Allah, bénis cette nourriture et donne-nous mieux encore.",
-    ctx: "Avant/après manger",
-    src: "Tirmidhi"
-  },
-  {
     id: "forgiveness",
     ar: "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
     tr: "Rabbana ẓalamnā anfusanā wa in lam taghfir lanā wa tarḥamnā lanakūnanna mina-l-khāsirīn.",
@@ -126,7 +80,7 @@ const DUA_LIST = [
     src: "Qur’ān 7:23"
   },
   {
-    id: "mercy-parents",
+    id: "parents",
     ar: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
     tr: "Rabbi irḥamhumā kamā rabbayānī ṣaghīrā.",
     fr: "Seigneur, fais-leur miséricorde comme ils m’ont élevé petit.",
@@ -145,21 +99,27 @@ const DUA_LIST = [
 
 /* ---------------- Utils ---------------- */
 function seededPick(arr, seedNumber) {
-  // sélection déterministe: seedNumber mod arr.length
   if (!arr?.length) return null;
   const idx = Math.abs(seedNumber) % arr.length;
   return arr[idx];
 }
-
 function todaySeed() {
   const d = new Date();
-  // ex: YYYY*100 + MM * 100 + DD
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 
-export default function HowToScreen() {
+export default function HowToScreen({ route }) {
   const { THEME } = useTheme26x();
-  const [mode, setMode] = useState("names"); // "names" | "wudu" | "dua"
+
+  // lecture du mode initial (pour ouvrir directement “dua” depuis la Home)
+  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua"
+  const [mode, setMode] = useState(initial);
+  useEffect(() => {
+    if (route?.params?.initialMode && route.params.initialMode !== mode) {
+      setMode(route.params.initialMode);
+    }
+  }, [route?.params?.initialMode]);
+
   const [query, setQuery] = useState("");
 
   /* --------- Asma: filtre --------- */
@@ -384,7 +344,7 @@ export default function HowToScreen() {
         <Header />
         <Segmented />
 
-        {/* Aperçu cartes gradient */}
+        {/* Carte gradient Dua du jour */}
         <LinearGradient
           colors={THEME.screenGradient}
           style={{
