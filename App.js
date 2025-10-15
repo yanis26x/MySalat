@@ -15,7 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPrayerTimesForDate } from "./src/prayerTimes";
 import { scheduleNextDays } from "./src/scheduler";
-import NotesScreen from "./src/screens/NotesScreen";
+import ParametresScreen from "./src/screens/ParametresScreen";
 import QiblaScreen from "./src/screens/QiblaScreen";
 import HowToScreen from "./src/screens/Learn";
 import { ThemeProvider, useTheme26x } from "./src/themeContext";
@@ -85,9 +85,13 @@ function HomeScreen() {
     (async () => {
       try {
         await Notifications.requestPermissionsAsync();
-        const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
+        const { status: locStatus } =
+          await Location.requestForegroundPermissionsAsync();
         if (locStatus !== "granted") {
-          Alert.alert("Localisation requise", "Active la localisation pour calculer les horaires.");
+          Alert.alert(
+            "Localisation requise",
+            "Active la localisation pour calculer les horaires."
+          );
           setLoading(false);
           return;
         }
@@ -98,10 +102,17 @@ function HomeScreen() {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
 
-        const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
+        const places = await Location.reverseGeocodeAsync({
+          latitude: lat,
+          longitude: lon,
+        });
         const prettyCity =
           places.length > 0
-            ? places[0].city || places[0].subregion || places[0].region || places[0].country || "Unknown"
+            ? places[0].city ||
+              places[0].subregion ||
+              places[0].region ||
+              places[0].country ||
+              "Unknown"
             : "Unknown";
         setCoords({ lat, lon, prettyCity });
 
@@ -126,7 +137,10 @@ function HomeScreen() {
         await scheduleNextDays(lat, lon, 7);
       } catch (e) {
         console.error("Init error:", e);
-        Alert.alert("Erreur", "Un problème est survenu lors de l'initialisation.");
+        Alert.alert(
+          "Erreur",
+          "Un problème est survenu lors de l'initialisation."
+        );
       } finally {
         setLoading(false);
       }
@@ -136,11 +150,17 @@ function HomeScreen() {
   // Trouver prochaine et précédente prière + progression
   const { nextInfo, prevInfo, progress } = useMemo(() => {
     if (!todayTimes) return { nextInfo: null, prevInfo: null, progress: 0 };
-    const order = PRAYERS.map((k) => ({ key: k, at: todayTimes[k] })).sort((a, b) => a.at - b.at);
+    const order = PRAYERS.map((k) => ({ key: k, at: todayTimes[k] })).sort(
+      (a, b) => a.at - b.at
+    );
 
     const upcoming = order.find((o) => o.at.getTime() > now.getTime());
-    const previous =
-      [...order].reverse().find((o) => o.at.getTime() <= now.getTime()) || { key: "isha", at: order[order.length - 1].at };
+    const previous = [...order]
+      .reverse()
+      .find((o) => o.at.getTime() <= now.getTime()) || {
+      key: "isha",
+      at: order[order.length - 1].at,
+    };
 
     let pct = 0;
     if (upcoming) {
@@ -150,7 +170,11 @@ function HomeScreen() {
       const done = now.getTime() - start.getTime();
       pct = Math.max(0, Math.min(1, done / total));
     }
-    return { nextInfo: upcoming || null, prevInfo: previous || null, progress: pct };
+    return {
+      nextInfo: upcoming || null,
+      prevInfo: previous || null,
+      progress: pct,
+    };
   }, [todayTimes, now]);
 
   const greet = useMemo(() => {
@@ -175,9 +199,14 @@ function HomeScreen() {
 
   if (loading) {
     return (
-      <LinearGradient colors={THEME.screenGradient} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <LinearGradient
+        colors={THEME.screenGradient}
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      >
         <ActivityIndicator size="large" color={THEME.accent} />
-        <Text style={{ color: THEME.sub, marginTop: 12 }}>Préparation de ta journée…</Text>
+        <Text style={{ color: THEME.sub, marginTop: 12 }}>
+          Préparation de ta journée…
+        </Text>
       </LinearGradient>
     );
   }
@@ -185,7 +214,10 @@ function HomeScreen() {
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+          showsVerticalScrollIndicator={false}
+        >
           {/* HEADER : Salam + Date + Localisation dessous */}
           <Section>
             <View style={{ alignItems: "center", marginBottom: 10 }}>
@@ -240,15 +272,33 @@ function HomeScreen() {
           {/* PROCHAINE PRIÈRE — carte riche avec barre de progression */}
           <Section>
             <Card THEME={THEME} style={{ padding: 18 }}>
-              <Text style={{ color: THEME.sub, marginBottom: 8 }}>Prochaine prière</Text>
+              <Text style={{ color: THEME.sub, marginBottom: 8 }}>
+                Prochaine prière
+              </Text>
 
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 <View style={{ flex: 1 }}>
-                  <Text style={{ color: THEME.text, fontSize: 22, fontWeight: "800" }}>
+                  <Text
+                    style={{
+                      color: THEME.text,
+                      fontSize: 22,
+                      fontWeight: "800",
+                    }}
+                  >
                     {nextInfo ? nextInfo.key.toUpperCase() : "—"}
                   </Text>
-                  <Text style={{ color: THEME.accent, fontSize: 16, marginTop: 4 }}>
-                    {nextInfo ? `dans ${fmtCountdown(nextInfo.at)}` : "toutes passées pour aujourd’hui"}
+                  <Text
+                    style={{ color: THEME.accent, fontSize: 16, marginTop: 4 }}
+                  >
+                    {nextInfo
+                      ? `dans ${fmtCountdown(nextInfo.at)}`
+                      : "toutes passées pour aujourd’hui"}
                   </Text>
                 </View>
 
@@ -265,14 +315,30 @@ function HomeScreen() {
                   }}
                 >
                   <Text style={{ color: THEME.sub, fontSize: 12 }}>à</Text>
-                  <Text style={{ color: THEME.text, fontSize: 20, fontWeight: "800" }}>
+                  <Text
+                    style={{
+                      color: THEME.text,
+                      fontSize: 20,
+                      fontWeight: "800",
+                    }}
+                  >
                     {nextInfo ? format(nextInfo.at, "HH:mm") : "--:--"}
                   </Text>
                 </View>
               </View>
 
               {/* barre progression simple */}
-              <View style={{ height: 8, backgroundColor: THEME.surface, borderRadius: 999, marginTop: 14, overflow: "hidden", borderWidth: 1, borderColor: THEME.border }}>
+              <View
+                style={{
+                  height: 8,
+                  backgroundColor: THEME.surface,
+                  borderRadius: 999,
+                  marginTop: 14,
+                  overflow: "hidden",
+                  borderWidth: 1,
+                  borderColor: THEME.border,
+                }}
+              >
                 <View
                   style={{
                     width: `${Math.round((progress || 0) * 100)}%`,
@@ -283,12 +349,20 @@ function HomeScreen() {
               </View>
 
               {prevInfo && nextInfo && (
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginTop: 8,
+                  }}
+                >
                   <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                    Depuis {prevInfo.key.toUpperCase()} · {format(prevInfo.at, "HH:mm")}
+                    Depuis {prevInfo.key.toUpperCase()} ·{" "}
+                    {format(prevInfo.at, "HH:mm")}
                   </Text>
                   <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                    Vers {nextInfo.key.toUpperCase()} · {format(nextInfo.at, "HH:mm")}
+                    Vers {nextInfo.key.toUpperCase()} ·{" "}
+                    {format(nextInfo.at, "HH:mm")}
                   </Text>
                 </View>
               )}
@@ -314,8 +388,12 @@ function HomeScreen() {
                 }}
               >
                 <Ionicons name="compass" size={20} color={THEME.accent} />
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>Qibla</Text>
-                <Text style={{ color: THEME.sub, fontSize: 12 }}>Trouve la direction</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  Qibla
+                </Text>
+                <Text style={{ color: THEME.sub, fontSize: 12 }}>
+                  Trouve la direction
+                </Text>
               </Pressable>
 
               <Pressable
@@ -334,12 +412,18 @@ function HomeScreen() {
                 }}
               >
                 <Ionicons name="school" size={20} color={THEME.accent} />
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>How To</Text>
-                <Text style={{ color: THEME.sub, fontSize: 12 }}>Noms & Wudu</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  How To
+                </Text>
+                <Text style={{ color: THEME.sub, fontSize: 12 }}>
+                  Noms & Wudu
+                </Text>
               </Pressable>
 
               <Pressable
-                onPress={() => navigation.navigate("HowTo", { initialMode: "dua" })}
+                onPress={() =>
+                  navigation.navigate("HowTo", { initialMode: "dua" })
+                }
                 style={{
                   flex: 1,
                   backgroundColor: THEME.card,
@@ -354,8 +438,12 @@ function HomeScreen() {
                 }}
               >
                 <Ionicons name="sparkles" size={20} color={THEME.accent} />
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>Dua du jour</Text>
-                <Text style={{ color: THEME.sub, fontSize: 12 }}>Invocation & partage</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  Dua du jour
+                </Text>
+                <Text style={{ color: THEME.sub, fontSize: 12 }}>
+                  Invocation & partage
+                </Text>
               </Pressable>
             </View>
           </Section>
@@ -363,9 +451,21 @@ function HomeScreen() {
           {/* LISTE DU JOUR */}
           <Section>
             <Card THEME={THEME}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
-                <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>Aujourd’hui</Text>
-                <Text style={{ color: THEME.sub }}>{format(now, "dd MMM")}</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <Text
+                  style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}
+                >
+                  Aujourd’hui
+                </Text>
+                <Text style={{ color: THEME.sub }}>
+                  {format(now, "dd MMM")}
+                </Text>
               </View>
 
               {todayTimes ? (
@@ -384,13 +484,21 @@ function HomeScreen() {
                         borderBottomColor: THEME.border,
                       }}
                     >
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
                         <View
                           style={{
                             width: 10,
                             height: 10,
                             borderRadius: 999,
-                            backgroundColor: isNext ? THEME.accent : THEME.border,
+                            backgroundColor: isNext
+                              ? THEME.accent
+                              : THEME.border,
                           }}
                         />
                         <Text
@@ -404,12 +512,16 @@ function HomeScreen() {
                           {k}
                         </Text>
                       </View>
-                      <Text style={{ color: THEME.text, fontSize: 16 }}>{format(t, "HH:mm")}</Text>
+                      <Text style={{ color: THEME.text, fontSize: 16 }}>
+                        {format(t, "HH:mm")}
+                      </Text>
                     </View>
                   );
                 })
               ) : (
-                <Text style={{ color: "#b91c1c" }}>Impossible de calculer les horaires.</Text>
+                <Text style={{ color: "#b91c1c" }}>
+                  Impossible de calculer les horaires.
+                </Text>
               )}
             </Card>
           </Section>
@@ -417,9 +529,21 @@ function HomeScreen() {
           {/* APERÇU 5 JOURS */}
           <Section>
             <Card THEME={THEME}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
-                <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>Prochains jours</Text>
-                <Text style={{ color: THEME.sub, fontSize: 12 }}>Fajr / Maghrib</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <Text
+                  style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}
+                >
+                  Prochains jours
+                </Text>
+                <Text style={{ color: THEME.sub, fontSize: 12 }}>
+                  Fajr / Maghrib
+                </Text>
               </View>
 
               {weekPeek.map((d, idx) => (
@@ -433,10 +557,28 @@ function HomeScreen() {
                     borderBottomColor: THEME.border,
                   }}
                 >
-                  <Text style={{ color: THEME.text, width: 110 }}>{format(d.date, "EEE dd MMM")}</Text>
-                  <Text style={{ color: THEME.sub, width: 70, textAlign: "right" }}>{format(d.fajr, "HH:mm")}</Text>
-                  <Text style={{ color: THEME.text, width: 12, textAlign: "center" }}>·</Text>
-                  <Text style={{ color: THEME.text, width: 70, textAlign: "right" }}>{format(d.maghrib, "HH:mm")}</Text>
+                  <Text style={{ color: THEME.text, width: 110 }}>
+                    {format(d.date, "EEE dd MMM")}
+                  </Text>
+                  <Text
+                    style={{ color: THEME.sub, width: 70, textAlign: "right" }}
+                  >
+                    {format(d.fajr, "HH:mm")}
+                  </Text>
+                  <Text
+                    style={{
+                      color: THEME.text,
+                      width: 12,
+                      textAlign: "center",
+                    }}
+                  >
+                    ·
+                  </Text>
+                  <Text
+                    style={{ color: THEME.text, width: 70, textAlign: "right" }}
+                  >
+                    {format(d.maghrib, "HH:mm")}
+                  </Text>
                 </View>
               ))}
             </Card>
@@ -444,7 +586,14 @@ function HomeScreen() {
 
           {/* FOOTER */}
           <View style={{ alignItems: "center", marginTop: 8 }}>
-            <Text style={{ color: THEME.accent, fontSize: 12, fontWeight: "700", letterSpacing: 0.4 }}>
+            <Text
+              style={{
+                color: THEME.accent,
+                fontSize: 12,
+                fontWeight: "700",
+                letterSpacing: 0.4,
+              }}
+            >
               © 2025 yanis26x · Tous droits réservé
             </Text>
           </View>
@@ -473,16 +622,40 @@ function AppShell() {
           },
           tabBarIcon: ({ color, size, focused }) => {
             if (route.name === "Home") {
-              return <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />;
+              return (
+                <Ionicons
+                  name={focused ? "home" : "home-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
             }
             if (route.name === "Qibla") {
-              return <Ionicons name={focused ? "compass" : "compass-outline"} size={size} color={color} />;
+              return (
+                <Ionicons
+                  name={focused ? "compass" : "compass-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
             }
-            if (route.name === "Notes") {
-              return <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />;
+            if (route.name === "Parametres") {
+              return (
+                <Ionicons
+                  name={focused ? "settings" : "settings-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
             }
-            if (route.name === "HowTo") {
-              return <Ionicons name={focused ? "help-circle" : "help-circle-outline"} size={size} color={color} />;
+            if (route.name === "Learn") {
+              return (
+                <Ionicons
+                  name={focused ? "book" : "book-outline"}
+                  size={size}
+                  color={color}
+                />
+              );
             }
             return null;
           },
@@ -490,8 +663,8 @@ function AppShell() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Qibla" component={QiblaScreen} />
-        <Tab.Screen name="Notes" component={NotesScreen} />
-        <Tab.Screen name="HowTo" component={HowToScreen} />
+        <Tab.Screen name="Parametres" component={ParametresScreen} />
+        <Tab.Screen name="Learn" component={HowToScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

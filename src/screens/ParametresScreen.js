@@ -138,7 +138,7 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
   );
 }
 
-export default function NotesScreen() {
+export default function ParametresScreen() {
   const { THEME, themeKey, setThemeKey, THEMES } = useTheme26x();
 
   // ---------- État des préférences notifs ----------
