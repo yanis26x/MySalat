@@ -17,7 +17,7 @@ import { getPrayerTimesForDate } from "./src/prayerTimes";
 import { scheduleNextDays } from "./src/scheduler";
 import NotesScreen from "./src/screens/NotesScreen";
 import QiblaScreen from "./src/screens/QiblaScreen";
-import HowToScreen from "./src/screens/HowTo";
+import HowToScreen from "./src/screens/Learn";
 import { ThemeProvider, useTheme26x } from "./src/themeContext";
 import { useNavigation } from "@react-navigation/native";
 

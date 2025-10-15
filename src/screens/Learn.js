@@ -159,7 +159,7 @@ export default function HowToScreen({ route }) {
   /* --------- UI components --------- */
   const Header = () => (
     <View style={{ alignItems: "center", marginBottom: 12 }}>
-      <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>How To</Text>
+      <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Learn</Text>
       <Text style={{ color: THEME.sub, marginTop: 4 }}>Guides rapides pour apprendre et réviser</Text>
     </View>
   );
