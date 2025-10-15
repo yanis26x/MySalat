@@ -2,6 +2,7 @@
   "expo": {
     "name": "MySalat",
     "slug": "MySalat",
+    "owner": "yanis26x",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logoV5.png",
@@ -53,8 +54,11 @@
 
     "extra": {
       "eas": {
-        "projectId": "YOUR-PROJECT-ID"
+        "projectId": "c0003c16-6c9e-414f-817e-4a7278303424"
       }
-    }
+    },
+
+    "runtimeVersion": { "policy": "appVersion" },
+    "updates": { "url": "https://u.expo.dev/c0003c16-6c9e-414f-817e-4a7278303424" }
   }
 }
