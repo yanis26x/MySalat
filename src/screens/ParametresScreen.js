@@ -462,30 +462,7 @@ export default function ParametresScreen() {
             </Text>
           </View>
 
-          {/* ---------- About ---------- */}
-          <View
-            style={{
-              backgroundColor: THEME.card,
-              borderColor: THEME.border,
-              borderWidth: 1,
-              padding: 16,
-              borderRadius: 16,
-              marginBottom: 22,
-              shadowColor: "#000",
-              shadowOpacity: 0.08,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 4 },
-              elevation: 2,
-            }}
-          >
-            <SectionHeader
-              icon="information-circle-outline"
-              title="Why MySalat ?"
-            />
-            <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
-              Pour augmenter mon taux de Hassanate
-            </Text>
-          </View>
+      
 
           {/* ---------- À venir ---------- */}
           <View
@@ -505,8 +482,11 @@ export default function ParametresScreen() {
           >
             <SectionHeader icon="information-circle-outline" title="À venir.." />
             <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
-              Des publicités dans l'app pour financer le projet et payer les
-              serveurs. + une version web. + plein d'autres trucs !
+  La plupart des applications de prière vous bombardent de publicités, alors que vous souhaitez simplement une application légère pour vous rappeler les horaires de prière et la direction de la Qibla. 
+  C’est pourquoi je vais ajouter un bouton : une publicité ne s’affichera que si vous appuyez dessus.
+  {"\n\n"}
+  Je fais cette fonctionnalité pour vous donner la possibilité de soutenir le développement de l’application si vous en avez le temps et l’envie. 
+  Je ne vous oblige à rien ; les hassanates que j’obtiens me suffisent largement !
             </Text>
           </View>
 
