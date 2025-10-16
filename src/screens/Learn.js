@@ -9,10 +9,10 @@ import {
   ScrollView,
   Share,
   Modal,
-  SafeAreaView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme26x } from "../themeContext";
 
 /* ---------------- Asma ul Husna (extrait – version française) ---------------- */
@@ -118,7 +118,6 @@ const ASMA_UL_HUSNA = [
   { id: 99, ar: "الرَّشِيد", translit: "Ar-Rashīd", meaning: "Celui qui guide vers le droit chemin" },
 ];
 
-
 /* ---------------- Wudu steps (grosses cartes) ---------------- */
 const WUDU_STEPS = [
   { k: "niyyah",    title: "Intention (Niyyah)", desc: "Avoir l’intention de faire wudu pour prier." },
@@ -152,6 +151,30 @@ const PILLARS = [
   { k: "zakat",   title: "Zakât (Aumône légale)",        ar: "الزكاة", fr: "Aumône purificatrice quand les conditions sont remplies.", desc: "Solidarité et purification.", icon: "cash-outline" },
   { k: "sawm",    title: "Sawm (Jeûne du Ramadan)",      ar: "الصيام", fr: "Jeûner le mois de Ramadan de l’aube au coucher du soleil.", desc: "Éducation de l’âme et gratitude.", icon: "flame-outline" },
   { k: "hajj",    title: "Hajj (Pèlerinage)",            ar: "الحج",   fr: "Pèlerinage à La Mecque une fois dans la vie si possible.", desc: "Unité de la Oumma.", icon: "airplane-outline" },
+];
+
+/* ---------------- Comment prier ? (rakaʿāt + étapes) ---------------- */
+const RAKAAH_TABLE = [
+  { key: "fajr",    label: "Fajr",    rakaat: 2, notes: "À voix haute" },
+  { key: "dhuhr",   label: "Dhuhr",   rakaat: 4, notes: "À voix basse" },
+  { key: "asr",     label: "Asr",     rakaat: 4, notes: "À voix basse" },
+  { key: "maghrib", label: "Maghrib", rakaat: 3, notes: "1-2 à voix haute, 3 à voix basse" },
+  { key: "isha",    label: "Isha",    rakaat: 4, notes: "1-2 à voix haute, 3-4 à voix basse" },
+];
+
+const SALAH_STEPS = [
+  { n: 1,  title: "Intention (Niyyah)", desc: "Avoir l’intention sincère de prier telle prière, pour Allah." },
+  { n: 2,  title: "Takbîrat-ul-Ihrâm", desc: "Lever les mains (paumes vers la Qibla) et dire « Allāhu Akbar »." },
+  { n: 3,  title: "Position debout (Qiyām)", desc: "Poser la main droite sur la gauche, fixer l’endroit de la prosternation." },
+  { n: 4,  title: "Ouverture", desc: "Dire la dou‘â d’ouverture (facultatif) puis réciter al-Fātiḥa + une courte sourate." },
+  { n: 5,  title: "Inclinaison (Rukūʿ)", desc: "S’incliner dos droit, mains sur les genoux : « Subḥāna Rabbiyal-ʿAẓīm » (×3 min.)." },
+  { n: 6,  title: "Redressement", desc: "Se relever : « Samiʿa-llāhu liman ḥamidah » puis « Rabbana wa laka-l-ḥamd »." },
+  { n: 7,  title: "Prosternation (Sujūd)", desc: "Front + nez + mains + genoux + orteils au sol : « Subḥāna Rabbiyal-Aʿlā » (×3 min.)." },
+  { n: 8,  title: "Assise brève", desc: "S’asseoir (jalisa), invocations courtes, puis 2e prosternation identique." },
+  { n: 9,  title: "Seconde rakaʿa", desc: "Se relever et répéter (Fātiḥa + sourate, rukūʿ, sujūd ×2)." },
+  { n:10,  title: "At-Taḥiyyāt (assise)", desc: "Après 2 rakaʿāt, s’asseoir et dire : « At-Taḥiyyātu lillāh… » (inclure ṣalāt Ibrāhīmiyya à la fin)." },
+  { n:11,  title: "Dernière assise", desc: "Dans la dernière rakaʿa, compléter taḥiyyāt + salawāt + dou‘â." },
+  { n:12,  title: "Salām", desc: "Tourner la tête à droite puis à gauche : « As-salāmu ʿalaykum wa raḥmatullāh »." },
 ];
 
 /* ---------------- Utils ---------------- */
@@ -194,15 +217,12 @@ function SectionPicker({ mode, setMode, THEME, options }) {
           paddingHorizontal: 8,
         }}
       >
-
-                {/* Bouton “Tout voir” */}
         <Chip
           label="Tout voir"
           icon="grid-outline"
           THEME={THEME}
           onPress={() => setOpen(true)}
         />
-        
         {head.map((opt) => (
           <Chip
             key={opt.key}
@@ -213,14 +233,6 @@ function SectionPicker({ mode, setMode, THEME, options }) {
             onPress={() => setMode(opt.key)}
           />
         ))}
-
-        {/* Bouton “Tout voir” */}
-        <Chip
-          label="Tout voir"
-          icon="grid-outline"
-          THEME={THEME}
-          onPress={() => setOpen(true)}
-        />
       </ScrollView>
 
       {/* Hint du mode actif */}
@@ -241,6 +253,7 @@ function SectionPicker({ mode, setMode, THEME, options }) {
           }}
         >
           <SafeAreaView
+            edges={["bottom"]}
             style={{
               backgroundColor: THEME.card,
               borderTopLeftRadius: 20,
@@ -387,7 +400,7 @@ export default function HowToScreen({ route }) {
   const { THEME } = useTheme26x();
 
   // mode initial
-  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua" | "pillars"
+  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua" | "salah" | "pillars"
   const [mode, setMode] = useState(initial);
   useEffect(() => {
     if (route?.params?.initialMode && route.params.initialMode !== mode) {
@@ -436,8 +449,8 @@ export default function HowToScreen({ route }) {
     { key: "names",   label: "99 Noms d’Allah",  icon: "sparkles-outline" },
     { key: "wudu",    label: "Ablutions (Wudu)", icon: "water-outline" },
     { key: "dua",     label: "Dua du jour",      icon: "sunny-outline" },
+    { key: "salah",   label: "Comment prier ?",  icon: "reader-outline" },
     { key: "pillars", label: "5 Piliers",        icon: "albums-outline" },
-    // ➕ tu peux en ajouter plein d’autres ici
   ];
 
   /* =======================
@@ -445,7 +458,7 @@ export default function HowToScreen({ route }) {
      ======================= */
   if (mode === "names") {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <FlatList
           data={filteredNames}
           keyExtractor={(item) => String(item.id)}
@@ -512,11 +525,11 @@ export default function HowToScreen({ route }) {
   }
 
   /* =======================
-     MODE 2: WUDU (ScrollView) — cartes larges et aérées
+     MODE 2: WUDU (ScrollView)
      ======================= */
   if (mode === "wudu") {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
           <Header />
           <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
@@ -594,7 +607,7 @@ export default function HowToScreen({ route }) {
      ======================= */
   if (mode === "dua") {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
           <Header />
           <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
@@ -676,10 +689,133 @@ export default function HowToScreen({ route }) {
   }
 
   /* =======================
+     MODE 3bis: COMMENT PRIER (ScrollView)
+     ======================= */
+  if (mode === "salah") {
+    return (
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
+          <View style={{ alignItems: "center", marginBottom: 12 }}>
+            <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Comment prier ?</Text>
+            <Text style={{ color: THEME.sub, marginTop: 4 }}>Guide rapide des 5 prières + étapes d’une rakaʿa</Text>
+          </View>
+
+          <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
+
+          {/* Tableau des rakaʿāt */}
+          <View
+            style={{
+              backgroundColor: THEME.card,
+              borderColor: THEME.border,
+              borderWidth: 1,
+              borderRadius: 16,
+              overflow: "hidden",
+              marginBottom: 14,
+            }}
+          >
+            <View style={{ flexDirection: "row", padding: 12, borderBottomWidth: 1, borderBottomColor: THEME.border }}>
+              <Text style={{ flex: 1, color: THEME.sub, fontWeight: "800" }}>Prière</Text>
+              <Text style={{ width: 64, color: THEME.sub, fontWeight: "800", textAlign: "right" }}>Rakaʿāt</Text>
+              <Text style={{ flex: 1.2, color: THEME.sub, fontWeight: "800", textAlign: "right" }}>Voix</Text>
+            </View>
+
+            {RAKAAH_TABLE.map((row, i) => (
+              <View
+                key={row.key}
+                style={{
+                  flexDirection: "row",
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderTopWidth: i === 0 ? 0 : 1,
+                  borderTopColor: THEME.border,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ flex: 1, color: THEME.text, fontWeight: "700" }}>{row.label}</Text>
+                <Text style={{ width: 64, color: THEME.text, textAlign: "right" }}>{row.rakaat}</Text>
+                <Text style={{ flex: 1.2, color: THEME.sub, textAlign: "right" }}>{row.notes}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Étapes d’une rakaʿa */}
+          <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "900", marginBottom: 10 }}>
+            Étapes d’une rakaʿa
+          </Text>
+
+          <View style={{ gap: 12 }}>
+            {SALAH_STEPS.map((s) => (
+              <View
+                key={s.n}
+                style={{
+                  backgroundColor: THEME.card,
+                  borderColor: THEME.border,
+                  borderWidth: 1,
+                  borderRadius: 16,
+                  padding: 16,
+                  flexDirection: "row",
+                  gap: 14,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.06,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 1,
+                }}
+              >
+                <View
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 21,
+                    borderWidth: 2,
+                    borderColor: THEME.accent,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: THEME.accentSoft,
+                    marginTop: 2,
+                  }}
+                >
+                  <Text style={{ color: THEME.accent, fontWeight: "900", fontSize: 16 }}>{s.n}</Text>
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>{s.title}</Text>
+                  <Text style={{ color: THEME.sub, marginTop: 6, lineHeight: 20, fontSize: 14 }}>{s.desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Note */}
+          <View
+            style={{
+              backgroundColor: THEME.card,
+              borderColor: THEME.border,
+              borderWidth: 1,
+              borderRadius: 14,
+              padding: 14,
+              marginTop: 14,
+            }}
+          >
+            <Text style={{ color: THEME.sub, fontSize: 12 }}>
+              ℹ️ Résumé pédagogique (pratique courante). Certaines écoles ont de légères variantes
+              (formulations, placement des mains, etc.). Réfère-toi à un savant/local pour approfondir.
+            </Text>
+          </View>
+
+          <View style={{ alignItems: "center", marginTop: 14 }}>
+            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  /* =======================
      MODE 4: PILIERS (ScrollView)
      ======================= */
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: THEME.appBg }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
         <Header />
         <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
