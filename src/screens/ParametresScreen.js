@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme26x } from "../themeContext";
 import { getPrayerTimesForDate } from "../prayerTimes";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 const INSTAGRAM_USER = "yanis26x";
 const GITHUB_USER = "yanis26x";
@@ -68,7 +69,6 @@ async function openExternal(urls) {
 
 /* ---------- Replanification simple sur 7 jours selon préférences ---------- */
 async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
-  // Permissions notifs + localisation
   const perm = await Notifications.requestPermissionsAsync();
   if (perm.status !== "granted") {
     Alert.alert(
@@ -94,12 +94,9 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
   const lat = pos.coords.latitude;
   const lon = pos.coords.longitude;
 
-  // On annule tout pour repartir propre
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
-  } catch (e) {
-    // ignore
-  }
+  } catch {}
 
   const now = new Date();
 
@@ -109,12 +106,10 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
 
     const times = getPrayerTimesForDate(lat, lon, d);
     for (const key of PRAYERS) {
-      if (!prefs[key]) continue; // pas activé => on saute
+      if (!prefs[key]) continue;
 
-      const at = times[key]; // Date
+      const at = times[key];
       if (!(at instanceof Date)) continue;
-
-      // Si l'heure est déjà passée pour aujourd'hui, on ne programme pas aujourd’hui
       if (i === 0 && at.getTime() <= Date.now()) continue;
 
       try {
@@ -140,6 +135,7 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
 
 export default function ParametresScreen() {
   const { THEME, themeKey, setThemeKey, THEMES } = useTheme26x();
+  const tabBarHeight = useBottomTabBarHeight();
 
   // ---------- État des préférences notifs ----------
   const [notifPrefs, setNotifPrefs] = useState({
@@ -199,8 +195,18 @@ export default function ParametresScreen() {
 
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
+      {/* ✅ top seulement pour éviter le “rectangle” en bas */}
+      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{
+            padding: 20,
+            // ✅ on réserve l’espace de la tab bar pour ne rien masquer
+            paddingBottom: tabBarHeight + 16,
+          }}
+          showsVerticalScrollIndicator={false}
+          // (facultatif) si Android te pousse encore le contenu :
+          // contentInsetAdjustmentBehavior="never"
+        >
           {/* Header */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
             <Text
@@ -359,7 +365,7 @@ export default function ParametresScreen() {
 
             {/* Grille de thèmes */}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-              {THEME_KEYS.map((key) => {
+              {Object.keys(THEMES).map((key) => {
                 const t = THEMES[key];
                 const active = key === themeKey;
                 return (
@@ -375,7 +381,6 @@ export default function ParametresScreen() {
                       padding: 12,
                     }}
                   >
-                    {/* mini aperçu gradient */}
                     <LinearGradient
                       colors={t.screenGradient}
                       style={{
@@ -387,16 +392,10 @@ export default function ParametresScreen() {
                         borderColor: THEME.border,
                       }}
                     />
-
-                    {/* titre dans la couleur du thème */}
                     <Text style={{ color: t.accent, fontWeight: "800" }}>
                       {t.label}
                     </Text>
-
-                    {/* petites pastilles */}
-                    <View
-                      style={{ flexDirection: "row", marginTop: 8, gap: 6 }}
-                    >
+                    <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
                       <View
                         style={{
                           width: 16,
@@ -488,8 +487,7 @@ export default function ParametresScreen() {
             </Text>
           </View>
 
-          {/* ---------- A venir ---------- */}
-
+          {/* ---------- À venir ---------- */}
           <View
             style={{
               backgroundColor: THEME.card,
@@ -505,10 +503,7 @@ export default function ParametresScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader
-              icon="information-circle-outline"
-              title="À venir.."
-            />
+            <SectionHeader icon="information-circle-outline" title="À venir.." />
             <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
               Des publicités dans l'app pour financer le projet et payer les
               serveurs. + une version web. + plein d'autres trucs !
@@ -531,11 +526,7 @@ export default function ParametresScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader
-              icon="heart-outline"
-              title="Follow me"
-              subtitle="Let’s connect"
-            />
+            <SectionHeader icon="heart-outline" title="Follow me" subtitle="Let’s connect" />
 
             {/* Instagram */}
             <Pressable
@@ -572,9 +563,7 @@ export default function ParametresScreen() {
 
             {/* GitHub */}
             <Pressable
-              onPress={() =>
-                openExternal({ web: `https://github.com/${GITHUB_USER}` })
-              }
+              onPress={() => openExternal({ web: `https://github.com/${GITHUB_USER}` })}
               style={{
                 flexDirection: "row",
                 alignItems: "center",

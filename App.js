@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
@@ -23,7 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 
 // 🧭 Navigation
 import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator, useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 Notifications.setNotificationHandler({
@@ -69,6 +68,7 @@ function Card({ children, style, THEME }) {
 function HomeScreen() {
   const { THEME } = useTheme26x();
   const navigation = useNavigation();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
@@ -213,9 +213,9 @@ function HomeScreen() {
 
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+          contentContainerStyle={{ padding: 20, paddingBottom: tabBarHeight + 16 }}
           showsVerticalScrollIndicator={false}
         >
           {/* HEADER : Salam + Date + Localisation dessous */}
@@ -617,8 +617,7 @@ function AppShell() {
           tabBarInactiveTintColor: THEME.sub,
           tabBarStyle: {
             backgroundColor: THEME.tabBg ?? THEME.card,
-            borderTopColor: THEME.border,
-            borderTopWidth: 1,
+            borderTopWidth: 0, // enlève la bande gênante
           },
           tabBarIcon: ({ color, size, focused }) => {
             if (route.name === "Home") {
@@ -663,8 +662,8 @@ function AppShell() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Qibla" component={QiblaScreen} />
-        <Tab.Screen name="Parametres" component={ParametresScreen} />
         <Tab.Screen name="Learn" component={HowToScreen} />
+        <Tab.Screen name="Parametres" component={ParametresScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
