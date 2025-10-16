@@ -9,6 +9,7 @@ import {
   Linking,
   Platform,
   Switch,
+  Image
 } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
@@ -565,6 +566,36 @@ export default function ParametresScreen() {
               </View>
               <Ionicons name="open-outline" size={18} color={THEME.sub} />
             </Pressable>
+
+            {/* 🌐 Site Web */}
+<Pressable
+  onPress={() => Linking.openURL("https://yanis26x.github.io/yanis26x/")}
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 14,
+    borderRadius: 12,
+    borderColor: THEME.border,
+    borderWidth: 1,
+    marginBottom: 10,
+    gap: 12,
+    backgroundColor: THEME.surface,
+  }}
+>
+  {/* Ton logo PNG à la place de Ionicons */}
+  <Image
+    source={require("../../assets/26xLogo.png")} // ← change le chemin selon ton projet
+    style={{ width: 24, height: 24, borderRadius: 6 }}
+    resizeMode="contain"
+  />
+
+  <View style={{ flex: 1 }}>
+    <Text style={{ color: THEME.text, fontWeight: "700" }}>Site web</Text>
+    <Text style={{ color: THEME.sub }}>yanis26x.github.io</Text>
+  </View>
+
+  <Ionicons name="open-outline" size={18} color={THEME.sub} />
+</Pressable>
 
             {/* LinkedIn */}
             <Pressable
