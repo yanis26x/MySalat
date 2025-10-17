@@ -22,8 +22,8 @@ import { ThemeProvider, useTheme26x } from "./src/themeContext";
 import { useNavigation, NavigationContainer } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Footer from "./src/components/Footer";
-// ⬇️ Nouveau composant d’onglets
 import Tabs from "./src/navigation/Tabs";
+import { useTranslation } from "react-i18next";
 
 // Notifications
 Notifications.setNotificationHandler({
@@ -68,7 +68,7 @@ function Card({ children, style, THEME }) {
 function HomeScreen() {
   const { THEME } = useTheme26x();
   const navigation = useNavigation();
-  // 👉 useBottomTabBarHeight vient du composant d’onglets, inutile ici
+  const { t } = useTranslation("menu");
 
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
@@ -77,8 +77,8 @@ function HomeScreen() {
   const [weekPeek, setWeekPeek] = useState([]); // 5 jours compacts
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -90,8 +90,8 @@ function HomeScreen() {
 
         if (locStatus !== "granted") {
           Alert.alert(
-            "Localisation requise",
-            "Active la localisation pour calculer les horaires."
+            t("alerts.locationRequired.title"),
+            t("alerts.locationRequired.body")
           );
           setLoading(false);
           return;
@@ -115,8 +115,8 @@ function HomeScreen() {
               places[0].subregion ||
               places[0].region ||
               places[0].country ||
-              "Unknown"
-            : "Unknown";
+              t("city.unknown")
+            : t("city.unknown");
 
         setCoords({ lat, lon, prettyCity });
 
@@ -141,15 +141,12 @@ function HomeScreen() {
         await scheduleNextDays(lat, lon, 7);
       } catch (e) {
         console.error("Init error:", e);
-        Alert.alert(
-          "Erreur",
-          "Un problème est survenu lors de l'initialisation."
-        );
+        Alert.alert(t("alerts.initError.title"), t("alerts.initError.body"));
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [t]);
 
   // Trouver prochaine et précédente prière + progression
   const { nextInfo, prevInfo, progress } = useMemo(() => {
@@ -180,16 +177,16 @@ function HomeScreen() {
 
   const greet = useMemo(() => {
     const h = now.getHours();
-    if (h < 6) return "Salut, tu dors pas?!";
-    if (h < 12) return "Bon matin ☀️";
-    if (h < 18) return "Bonne journée !";
-    return "Bonne soirée 🌙";
-  }, [now]);
+    if (h < 6) return t("greet.nightOwl");
+    if (h < 12) return t("greet.morning");
+    if (h < 18) return t("greet.afternoon");
+    return t("greet.evening");
+  }, [now, t]);
 
   function fmtCountdown(target) {
     if (!target) return "";
     const ms = target.getTime() - now.getTime();
-    if (ms <= 0) return "Now";
+    if (ms <= 0) return t("common.now");
     const s = Math.floor(ms / 1000);
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
@@ -206,7 +203,7 @@ function HomeScreen() {
       >
         <ActivityIndicator size="large" color={THEME.accent} />
         <Text style={{ color: THEME.sub, marginTop: 12 }}>
-          Préparation de ta journée…
+          {t("loading.preparingDay")}
         </Text>
       </LinearGradient>
     );
@@ -264,7 +261,7 @@ function HomeScreen() {
                     textAlign: "center",
                   }}
                 >
-                  {coords?.prettyCity ?? "Unknown"}
+                  {coords?.prettyCity ?? t("city.unknown")}
                 </Text>
               </View>
             </View>
@@ -274,7 +271,7 @@ function HomeScreen() {
           <Section>
             <Card THEME={THEME} style={{ padding: 18 }}>
               <Text style={{ color: THEME.sub, marginBottom: 8 }}>
-                Prochaine prière
+                {t("home.nextPrayer.title")}
               </Text>
 
               <View
@@ -296,8 +293,8 @@ function HomeScreen() {
                   </Text>
                   <Text style={{ color: THEME.accent, fontSize: 16, marginTop: 4 }}>
                     {nextInfo
-                      ? `dans ${fmtCountdown(nextInfo.at)}`
-                      : "toutes passées pour aujourd’hui"}
+                      ? t("home.nextPrayer.in", { time: fmtCountdown(nextInfo.at) })
+                      : t("home.nextPrayer.allPassed")}
                   </Text>
                 </View>
 
@@ -313,7 +310,9 @@ function HomeScreen() {
                     minWidth: 90,
                   }}
                 >
-                  <Text style={{ color: THEME.sub, fontSize: 12 }}>à</Text>
+                  <Text style={{ color: THEME.sub, fontSize: 12 }}>
+                    {t("home.nextPrayer.at")}
+                  </Text>
                   <Text
                     style={{
                       color: THEME.text,
@@ -356,12 +355,16 @@ function HomeScreen() {
                   }}
                 >
                   <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                    Depuis {prevInfo.key.toUpperCase()} ·{" "}
-                    {format(prevInfo.at, "HH:mm")}
+                    {t("home.nextPrayer.since", {
+                      prev: prevInfo.key.toUpperCase(),
+                      time: format(prevInfo.at, "HH:mm"),
+                    })}
                   </Text>
                   <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                    Vers {nextInfo.key.toUpperCase()} ·{" "}
-                    {format(nextInfo.at, "HH:mm")}
+                    {t("home.nextPrayer.towards", {
+                      next: nextInfo.key.toUpperCase(),
+                      time: format(nextInfo.at, "HH:mm"),
+                    })}
                   </Text>
                 </View>
               )}
@@ -387,9 +390,11 @@ function HomeScreen() {
                 }}
               >
                 <Ionicons name="compass" size={20} color={THEME.accent} />
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>Qibla</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  {t("shortcuts.qibla.title")}
+                </Text>
                 <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                  Trouve la direction
+                  {t("shortcuts.qibla.subtitle")}
                 </Text>
               </Pressable>
 
@@ -409,9 +414,11 @@ function HomeScreen() {
                 }}
               >
                 <Ionicons name="school" size={20} color={THEME.accent} />
-                <Text style={{ color: THEME.text, fontWeight: "800" }}>Learn</Text>
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>
+                  {t("shortcuts.learn.title")}
+                </Text>
                 <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                  enprendre & pratiquer
+                  {t("shortcuts.learn.subtitle")}
                 </Text>
               </Pressable>
 
@@ -432,10 +439,10 @@ function HomeScreen() {
               >
                 <Ionicons name="sparkles" size={20} color={THEME.accent} />
                 <Text style={{ color: THEME.text, fontWeight: "800" }}>
-                  Dua du jour
+                  {t("shortcuts.dua.title")}
                 </Text>
                 <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                  Invocation & partage
+                  {t("shortcuts.dua.subtitle")}
                 </Text>
               </Pressable>
             </View>
@@ -452,7 +459,7 @@ function HomeScreen() {
                 }}
               >
                 <Text style={{ color: THEME.text, fontSize: 18, fontWeight: "800" }}>
-                  Aujourd’hui
+                  {t("today.title")}
                 </Text>
                 <Text style={{ color: THEME.sub }}>
                   {format(now, "dd MMM")}
@@ -461,7 +468,7 @@ function HomeScreen() {
 
               {todayTimes ? (
                 PRAYERS.map((k) => {
-                  const t = todayTimes[k];
+                  const tAt = todayTimes[k];
                   const isNext = nextInfo && nextInfo.key === k;
                   return (
                     <View
@@ -505,18 +512,23 @@ function HomeScreen() {
                       </View>
 
                       <Text style={{ color: THEME.text, fontSize: 16 }}>
-                        {format(t, "HH:mm")}
+                        {format(tAt, "HH:mm")}
                       </Text>
                     </View>
                   );
                 })
               ) : (
                 <Text style={{ color: "#b91c1c" }}>
-                  Impossible de calculer les horaires.
+                  {t("today.error")}
                 </Text>
               )}
             </Card>
           </Section>
+
+          {/* (Optionnel) Aperçu 5 jours — si tu veux l’afficher sur Home aussi
+              tu peux réutiliser les clés:
+              t("upcoming.title") / t("upcoming.legend") / t("common.dot")
+          */}
 
           {/* FOOTER */}
           <Footer />

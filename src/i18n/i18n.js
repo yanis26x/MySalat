@@ -11,6 +11,8 @@ import frQibla from "./fr/qibla.json";
 import enQibla from "./en/qibla.json";
 import frFooter from "./fr/footer.json";
 import enFooter from "./en/footer.json";
+import frMenu from "./fr/menu.json";
+import enMenu from "./en/menu.json";
 
 
 // 🧩 Regroupe toutes les langues ici
@@ -22,6 +24,7 @@ const resources = {
     tabs: frTabs, // namespace séparé pour les noms d’onglets
     qibla: frQibla,
     footer: frFooter,
+    menu: frMenu,
   },
   en: {
     translation: {
@@ -30,6 +33,7 @@ const resources = {
     tabs: enTabs,
     qibla: enQibla,
     footer: enFooter,
+    menu: enMenu,
   },
 };
 
