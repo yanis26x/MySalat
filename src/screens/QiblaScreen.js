@@ -9,6 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { qiblaBearing } from "../qibla";
 import { useTheme26x } from "../themeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Footer from "../components/Footer";
 
 const ALIGN_TOLERANCE_DEG = 10;
 
@@ -316,11 +317,7 @@ export default function QiblaScreen() {
           </View>
 
           {/* Footer */}
-          <View style={{ alignItems: "center", marginTop: 16 }}>
-            <Text style={{ color: THEME.accent, fontSize: 12, fontWeight: "700", letterSpacing: 0.4 }}>
-              © 2025 @yanis26x
-            </Text>
-          </View>
+          <Footer />
         </View>
 
         {/* MODAL: Pourquoi la Qibla ? */}

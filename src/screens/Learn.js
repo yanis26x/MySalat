@@ -14,6 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme26x } from "../themeContext";
+import Footer from "../components/Footer";
 
 /* ---------------- Asma ul Husna (extrait – version française) ---------------- */
 const ASMA_UL_HUSNA = [
@@ -399,8 +400,8 @@ function Tile({ label, icon = "ellipse-outline", active, onPress, THEME }) {
 export default function HowToScreen({ route }) {
   const { THEME } = useTheme26x();
 
-  // mode initial
-  const initial = route?.params?.initialMode ?? "names"; // "names" | "wudu" | "dua" | "salah" | "pillars"
+  // mode initial (obligé de démarrer sur "names")
+  const initial = route?.params?.initialMode ?? "names";
   const [mode, setMode] = useState(initial);
   useEffect(() => {
     if (route?.params?.initialMode && route.params.initialMode !== mode) {
@@ -408,19 +409,26 @@ export default function HowToScreen({ route }) {
     }
   }, [route?.params?.initialMode]);
 
-  const [query, setQuery] = useState("");
+  // mapping des titres/sous-titres par section
+  const MODE_META = {
+    names:  { title: "Learn",               subtitle: "Il n'est jamais trop tard pour apprendre !" },
+    wudu:   { title: "Ablutions (Wudu)",    subtitle: "Étapes simples, dans l'ordre" },
+    dua:    { title: "Dua du jour",         subtitle: "Un rappel pour le cœur" },
+    salah:  { title: "Comment prier ?",     subtitle: "Guide rapide des 5 prières + étapes d’une rakaʿa" },
+    pillars:{ title: "Les 5 Piliers",       subtitle: "Les bases de l’Islam en bref" },
+  };
 
-  /* --------- Asma: filtre --------- */
-  const filteredNames = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return ASMA_UL_HUSNA;
-    return ASMA_UL_HUSNA.filter(
-      (n) =>
-        n.ar.includes(q) ||
-        n.translit.toLowerCase().includes(q) ||
-        n.meaning.toLowerCase().includes(q)
+  const Header = () => {
+    const meta = MODE_META[mode] ?? MODE_META.names;
+    return (
+      <View style={{ alignItems: "center", marginBottom: 12 }}>
+        <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>{meta.title}</Text>
+        {meta.subtitle ? (
+          <Text style={{ color: THEME.sub, marginTop: 4 }}>{meta.subtitle}</Text>
+        ) : null}
+      </View>
     );
-  }, [query]);
+  };
 
   /* --------- Dua du jour --------- */
   const [dua, setDua] = useState(() => seededPick(DUA_LIST, todaySeed()));
@@ -436,14 +444,6 @@ export default function HowToScreen({ route }) {
     } catch {}
   };
 
-  /* --------- Header --------- */
-  const Header = () => (
-    <View style={{ alignItems: "center", marginBottom: 12 }}>
-      <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Learn</Text>
-      <Text style={{ color: THEME.sub, marginTop: 4 }}>Fait glisser pour voir sections</Text>
-    </View>
-  );
-
   /* --------- Options de la SectionPicker --------- */
   const OPTIONS = [
     { key: "names",   label: "99 Noms d’Allah",  icon: "sparkles-outline" },
@@ -454,13 +454,13 @@ export default function HowToScreen({ route }) {
   ];
 
   /* =======================
-     MODE 1: NOMS (FlatList)
+     MODE 1: NOMS (FlatList) – SANS barre de recherche
      ======================= */
   if (mode === "names") {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <FlatList
-          data={filteredNames}
+          data={ASMA_UL_HUSNA}
           keyExtractor={(item) => String(item.id)}
           keyboardShouldPersistTaps="handled"
           initialNumToRender={20}
@@ -470,30 +470,7 @@ export default function HowToScreen({ route }) {
             <View style={{ padding: 16, paddingBottom: 0 }}>
               <Header />
               <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
-              {/* Barre de recherche large */}
-              <View
-                style={{
-                  backgroundColor: THEME.card,
-                  borderColor: THEME.border,
-                  borderWidth: 1,
-                  borderRadius: 14,
-                  paddingHorizontal: 14,
-                  paddingVertical: 10,
-                  marginBottom: 14,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <Ionicons name="search" size={18} color={THEME.sub} />
-                <TextInput
-                  placeholder="Rechercher (arabe, translit, signification)…"
-                  placeholderTextColor={THEME.sub}
-                  value={query}
-                  onChangeText={setQuery}
-                  style={{ color: THEME.text, flex: 1, paddingVertical: 6, fontSize: 16 }}
-                />
-              </View>
+              {/* (Barre de recherche supprimée) */}
             </View>
           }
           renderItem={({ item }) => (
@@ -513,12 +490,7 @@ export default function HowToScreen({ route }) {
               <Text style={{ color: THEME.sub, marginTop: 6, fontSize: 14 }}>{item.meaning}</Text>
             </View>
           )}
-          ListEmptyComponent={<Text style={{ color: THEME.sub, padding: 16 }}>Aucun résultat.</Text>}
-          ListFooterComponent={
-            <View style={{ alignItems: "center", paddingVertical: 18 }}>
-              <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
-            </View>
-          }
+          ListFooterComponent={<Footer />}
         />
       </SafeAreaView>
     );
@@ -594,9 +566,7 @@ export default function HowToScreen({ route }) {
             </Text>
           </View>
 
-          <View style={{ alignItems: "center", marginTop: 14 }}>
-            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
-          </View>
+          <Footer />
         </ScrollView>
       </SafeAreaView>
     );
@@ -680,9 +650,7 @@ export default function HowToScreen({ route }) {
             </View>
           </LinearGradient>
 
-          <View style={{ alignItems: "center", marginTop: 8 }}>
-            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
-          </View>
+          <Footer />
         </ScrollView>
       </SafeAreaView>
     );
@@ -695,11 +663,7 @@ export default function HowToScreen({ route }) {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: THEME.appBg }}>
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 44 }}>
-          <View style={{ alignItems: "center", marginBottom: 12 }}>
-            <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Comment prier ?</Text>
-            <Text style={{ color: THEME.sub, marginTop: 4 }}>Guide rapide des 5 prières + étapes d’une rakaʿa</Text>
-          </View>
-
+          <Header />
           <SectionPicker mode={mode} setMode={setMode} THEME={THEME} options={OPTIONS} />
 
           {/* Tableau des rakaʿāt */}
@@ -803,9 +767,7 @@ export default function HowToScreen({ route }) {
             </Text>
           </View>
 
-          <View style={{ alignItems: "center", marginTop: 14 }}>
-            <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
-          </View>
+          <Footer />
         </ScrollView>
       </SafeAreaView>
     );
@@ -852,9 +814,7 @@ export default function HowToScreen({ route }) {
           ))}
         </View>
 
-        <View style={{ alignItems: "center", marginTop: 16 }}>
-          <Text style={{ color: THEME.accent, fontWeight: "700" }}>© 2025 @yanis26x</Text>
-        </View>
+        <Footer />
       </ScrollView>
     </SafeAreaView>
   );

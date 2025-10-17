@@ -20,6 +20,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme26x } from "../themeContext";
 import { getPrayerTimesForDate } from "../prayerTimes";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import Footer from "../components/Footer";
 
 const INSTAGRAM_USER = "yanis26x";
 const GITHUB_USER = "yanis26x";
@@ -655,12 +656,8 @@ export default function ParametresScreen() {
               </Text>
             </Pressable>
           </View>
-
-          <View style={{ alignItems: "center", marginTop: 20 }}>
-            <Text style={{ color: THEME.accent, fontWeight: "700" }}>
-              © 2025 yanis26x · Tous droits réservé
-            </Text>
-          </View>
+          {/* ---------- Footer ---------- */}
+          <Footer />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>

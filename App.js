@@ -19,6 +19,8 @@ import QiblaScreen from "./src/screens/QiblaScreen";
 import HowToScreen from "./src/screens/Learn";
 import { ThemeProvider, useTheme26x } from "./src/themeContext";
 import { useNavigation } from "@react-navigation/native";
+import Footer from "./src/components/Footer";
+
 
 // 🧭 Navigation
 import { NavigationContainer } from "@react-navigation/native";
@@ -585,18 +587,8 @@ function HomeScreen() {
           </Section>
 
           {/* FOOTER */}
-          <View style={{ alignItems: "center", marginTop: 8 }}>
-            <Text
-              style={{
-                color: THEME.accent,
-                fontSize: 12,
-                fontWeight: "700",
-                letterSpacing: 0.4,
-              }}
-            >
-              © 2025 yanis26x · Tous droits réservé
-            </Text>
-          </View>
+          <Footer/>
+          
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
