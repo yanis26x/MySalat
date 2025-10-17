@@ -148,7 +148,7 @@ export default function QiblaScreen() {
     return (
       <LinearGradient colors={THEME.screenGradient} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" color={THEME.accent} />
-        <Text style={{ color: THEME.sub, marginTop: 12 }}>Calibrating compass…</Text>
+        <Text style={{ color: THEME.sub, marginTop: 12 }}>Calibrage de la boussole…</Text>
       </LinearGradient>
     );
   }
@@ -156,168 +156,182 @@ export default function QiblaScreen() {
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ padding: 20, flex: 1 }}>
-          {/* Header */}
-          <View style={{ alignItems: "center", marginBottom: 16 }}>
-            <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Qibla</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                marginTop: 8,
-                paddingVertical: 6,
-                paddingHorizontal: 12,
-                borderRadius: 999,
-                borderWidth: 1,
-                borderColor: THEME.border,
-                backgroundColor: THEME.accentSoft,
-              }}
-            >
-              <Ionicons name="location" size={14} color={THEME.accent} />
-              <Text style={{ color: THEME.text, fontSize: 13, fontWeight: "700" }}>{city}</Text>
-            </View>
-          </View>
-
-          {/* Boussole simple */}
-          <View style={{ alignItems: "center", marginTop: 6 }}>
-            <View
-              style={{
-                width: 260,
-                height: 260,
-                borderRadius: 130,
-                backgroundColor: THEME.card,
-                borderWidth: 1,
-                borderColor: THEME.border,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: "#000",
-                shadowOpacity: 0.08,
-                shadowRadius: 16,
-                shadowOffset: { width: 0, height: 8 },
-                elevation: 2,
-              }}
-            >
-              <View
-                style={{
-                  width: 220,
-                  height: 220,
-                  borderRadius: 110,
-                  borderWidth: 1,
-                  borderColor: THEME.border,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: THEME.surface,
-                }}
-              >
-                {/* Petits repères */}
-                {[...Array(12)].map((_, i) => (
-                  <View
-                    key={i}
-                    style={{
-                      position: "absolute",
-                      top: 6,
-                      width: 2,
-                      height: i % 3 === 0 ? 16 : 10,
-                      backgroundColor: i % 3 === 0 ? THEME.accent : THEME.border,
-                      transform: [{ rotate: `${i * 30}deg` }],
-                    }}
-                  />
-                ))}
-
-                {/* Aiguille */}
-                <View
-                  style={{
-                    position: "absolute",
-                    width: 0,
-                    height: 0,
-                    borderLeftWidth: 12,
-                    borderRightWidth: 12,
-                    borderBottomWidth: 80,
-                    borderLeftColor: "transparent",
-                    borderRightColor: "transparent",
-                    borderBottomColor: isFacingQibla ? THEME.success : THEME.accent,
-                    transform: [{ rotate: `${arrowAngle}deg` }],
-                  }}
-                />
-              </View>
-            </View>
-
-            {/* Statut */}
-            <View style={{ alignItems: "center", marginTop: 14 }}>
+        {/* Zone principale */}
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={{
+              padding: 20,
+              paddingBottom: 140, // espace pour le footer fixe
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <View style={{ alignItems: "center", marginBottom: 12 }}>
+              <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>Qibla</Text>
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 8,
-                  paddingHorizontal: 12,
+                  gap: 6,
+                  marginTop: 8,
                   paddingVertical: 6,
+                  paddingHorizontal: 12,
                   borderRadius: 999,
                   borderWidth: 1,
-                  borderColor: isFacingQibla ? THEME.success : THEME.border,
-                  backgroundColor: isFacingQibla ? THEME.accentSoft : THEME.card,
+                  borderColor: THEME.border,
+                  backgroundColor: THEME.accentSoft,
                 }}
               >
-                <Ionicons
-                  name={isFacingQibla ? "checkmark-circle" : "ellipse-outline"}
-                  size={16}
-                  color={isFacingQibla ? THEME.success : THEME.sub}
-                />
-                <Text style={{ color: isFacingQibla ? THEME.success : THEME.text, fontWeight: "800" }}>
-                  {isFacingQibla ? "Aligné avec la Qibla" : "Tourne-toi vers la Qibla"}
-                </Text>
+                <Ionicons name="location" size={14} color={THEME.accent} />
+                <Text style={{ color: THEME.text, fontSize: 13, fontWeight: "700" }}>{city}</Text>
               </View>
 
-              {qibla != null && (
-                <Text style={{ color: THEME.sub, marginTop: 6 }}>
-                  Cap Qibla: <Text style={{ color: THEME.text, fontWeight: "800" }}>{Math.round(qibla)}°</Text>
-                </Text>
-              )}
+              {/* Pastille “Pourquoi la Qibla ?” (défile avec la page) */}
+              <Pressable
+                onPress={() => setWhyOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Pourquoi la Qibla ?"
+                style={{
+                  marginTop: 12,
+                  paddingHorizontal: 14,
+                  paddingVertical: 8,
+                  borderRadius: 999,
+                  borderWidth: 1,
+                  borderColor: THEME.border,
+                  backgroundColor: THEME.card,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Ionicons name="help-circle-outline" size={16} color={THEME.accent} />
+                <Text style={{ color: THEME.text, fontWeight: "800" }}>Pourquoi la Qibla ?</Text>
+              </Pressable>
             </View>
-          </View>
 
-          {/* Texte simple */}
-          <View
-            style={{
-              backgroundColor: THEME.card,
-              borderColor: THEME.border,
-              borderWidth: 1,
-              borderRadius: 14,
-              padding: 14,
-              marginTop: 18,
-            }}
-          >
-            <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800", marginBottom: 4 }}>
-              Direction de la prière
-            </Text>
-            <Text style={{ color: THEME.sub }}>
-              On prie en direction de la Kaaba, à La Mecque (Qibla).
-            </Text>
-          </View>
+            {/* Boussole */}
+            <View style={{ alignItems: "center", marginTop: 6 }}>
+              <View
+                style={{
+                  width: 260,
+                  height: 260,
+                  borderRadius: 130,
+                  backgroundColor: THEME.card,
+                  borderWidth: 1,
+                  borderColor: THEME.border,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  shadowColor: "#000",
+                  shadowOpacity: 0.08,
+                  shadowRadius: 16,
+                  shadowOffset: { width: 0, height: 8 },
+                  elevation: 2,
+                }}
+              >
+                <View
+                  style={{
+                    width: 220,
+                    height: 220,
+                    borderRadius: 110,
+                    borderWidth: 1,
+                    borderColor: THEME.border,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: THEME.surface,
+                  }}
+                >
+                  {/* Repères */}
+                  {[...Array(12)].map((_, i) => (
+                    <View
+                      key={i}
+                      style={{
+                        position: "absolute",
+                        top: 6,
+                        width: 2,
+                        height: i % 3 === 0 ? 16 : 10,
+                        backgroundColor: i % 3 === 0 ? THEME.accent : THEME.border,
+                        transform: [{ rotate: `${i * 30}deg` }],
+                      }}
+                    />
+                  ))}
 
-          {/* Bouton explication */}
-          <View style={{ alignItems: "center", marginTop: 18 }}>
-            <Pressable
-              onPress={() => setWhyOpen(true)}
+                  {/* Aiguille */}
+                  <View
+                    style={{
+                      position: "absolute",
+                      width: 0,
+                      height: 0,
+                      borderLeftWidth: 12,
+                      borderRightWidth: 12,
+                      borderBottomWidth: 80,
+                      borderLeftColor: "transparent",
+                      borderRightColor: "transparent",
+                      borderBottomColor: isFacingQibla ? THEME.success : THEME.accent,
+                      transform: [{ rotate: `${arrowAngle}deg` }],
+                    }}
+                  />
+                </View>
+              </View>
+
+              {/* Statut */}
+              <View style={{ alignItems: "center", marginTop: 14 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: isFacingQibla ? THEME.success : THEME.border,
+                    backgroundColor: isFacingQibla ? THEME.accentSoft : THEME.card,
+                  }}
+                >
+                  <Ionicons
+                    name={isFacingQibla ? "checkmark-circle" : "ellipse-outline"}
+                    size={16}
+                    color={isFacingQibla ? THEME.success : THEME.sub}
+                  />
+                  <Text style={{ color: isFacingQibla ? THEME.success : THEME.text, fontWeight: "800" }}>
+                    {isFacingQibla ? "Aligné avec la Qibla" : "Tourne-toi vers la Qibla"}
+                  </Text>
+                </View>
+
+                {qibla != null && (
+                  <Text style={{ color: THEME.sub, marginTop: 6 }}>
+                    Direction Qibla :{" "}
+                    <Text style={{ color: THEME.text, fontWeight: "800" }}>{Math.round(qibla)}°</Text>
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            {/* Info carte */}
+            <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: THEME.border,
                 backgroundColor: THEME.card,
+                borderColor: THEME.border,
+                borderWidth: 1,
+                borderRadius: 14,
+                padding: 14,
+                marginTop: 22,
               }}
             >
-              <Ionicons name="information-circle-outline" size={18} color={THEME.accent} />
-              <Text style={{ color: THEME.text, fontWeight: "800" }}>Pourquoi la Qibla ?</Text>
-            </Pressable>
-          </View>
+              <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800", marginBottom: 4 }}>
+                Direction de la prière
+              </Text>
+              <Text style={{ color: THEME.sub }}>
+                On prie en direction de la Kaaba (Qibla). Éloigne-toi de toute source magnétique et
+                calibre la boussole si nécessaire.
+              </Text>
+            </View>
+          </ScrollView>
 
-          {/* Footer */}
-          <Footer />
+          {/* FOOTER épinglé */}
+          <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
+            <Footer />
+          </View>
         </View>
 
         {/* MODAL: Pourquoi la Qibla ? */}
@@ -351,11 +365,10 @@ export default function QiblaScreen() {
                 <Text style={{ color: THEME.text, marginTop: 6 }}>
                   • <Text style={{ fontWeight: "800" }}>Qibla</Text> = direction de la{" "}
                   <Text style={{ fontWeight: "800" }}>Kaaba</Text> à La Mecque.{"\n"}
-                  • C’est un <Text style={{ fontWeight: "800" }}>ordre divin</Text> pour l’unité des musulmans (voir{" "}
-                  <Text style={{ fontStyle: "italic" }}>Coran 2:144</Text> et <Text style={{ fontStyle: "italic" }}>2:150</Text>).{"\n"}
-                  • Elle <Text style={{ fontWeight: "800" }}>rassemble</Text> les cœurs : où que l’on soit, on se tourne ensemble vers la même maison sacrée.{"\n"}
+                  • C’est un <Text style={{ fontWeight: "800" }}>ordre divin</Text> pour l’unité des musulmans (Coran 2:144, 2:150).{"\n"}
+                  • Elle <Text style={{ fontWeight: "800" }}>rassemble</Text> les cœurs où que l’on soit.{"\n"}
                   • Elle aide à la <Text style={{ fontWeight: "800" }}>concentration</Text> pendant la prière.{"\n"}
-                  • Si on fait de son mieux pour l’estimer et qu’on se trompe, la prière reste{" "}
+                  • Si tu fais de ton mieux pour l’estimer et que tu te trompes, la prière reste{" "}
                   <Text style={{ fontWeight: "800" }}>valide</Text> selon la majorité des savants.
                 </Text>
 
@@ -372,8 +385,8 @@ export default function QiblaScreen() {
                       backgroundColor: THEME.accent,
                     }}
                   >
-                    <Ionicons name="checkmark" size={16} color="#fff" />
-                    <Text style={{ color: "#fff", fontWeight: "800" }}>Compris</Text>
+                      <Ionicons name="checkmark" size={16} color="#fff" />
+                      <Text style={{ color: "#fff", fontWeight: "800" }}>Compris</Text>
                   </Pressable>
                 </View>
               </ScrollView>
