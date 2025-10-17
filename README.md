@@ -15,7 +15,7 @@ L’application est **techniquement pas encore publiée officiellement sur l’A
 # SCANE LE QR CODE POUR INSTALLER L’APP SUR TON TÉLÉPHONE !! (Installe Expo Go sur l’App Store dabord)
 ![QRCODE](https://github.com/yanis26x/yanis26x/blob/index/OST_IMG/QrcodeMySalat.png) 
 #
-[Lien du QRCODE](https://expo.dev/preview/update?message=cleanup&updateRuntimeVersion=1.0.0&createdAt=2025-10-15T18%3A49%3A27.552Z&slug=exp&projectId=c0003c16-6c9e-414f-817e-4a7278303424&group=40bc1e19-90aa-4458-a4e6-613c2ca97802)  
+[Lien du QRCODE](https://expo.dev/preview/update?message=MySalat26x+beta+V2&updateRuntimeVersion=1.0.0&createdAt=2025-10-17T10%3A54%3A25.242Z&slug=exp&projectId=c0003c16-6c9e-414f-817e-4a7278303424&group=04402fb6-fac7-407d-aadd-91dd56401413)  
 [Voir mes autres application](https://yanis26x.github.io/yanis26x/application/install.html)
 
 ## il reste **quelques ajustements** avant la mise en ligne officielle :
