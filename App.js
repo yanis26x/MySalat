@@ -415,10 +415,10 @@ function HomeScreen() {
               >
                 <Ionicons name="school" size={20} color={THEME.accent} />
                 <Text style={{ color: THEME.text, fontWeight: "800" }}>
-                  How To
+                  Learn
                 </Text>
                 <Text style={{ color: THEME.sub, fontSize: 12 }}>
-                  Noms & Wudu
+                  enprendre & pratiquer
                 </Text>
               </Pressable>
 
