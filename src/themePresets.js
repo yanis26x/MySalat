@@ -2,7 +2,7 @@
 export const THEMES = {
   // 🌿 Clair vert (actuel)
   greenLight: {
-    label: "Gentle Green",
+    label: "Mint",
     screenGradient: ["#E6F4EA", "#CDE9D5"],
     appBg: "#F3FDF6",
     card: "#E6F4EA",
@@ -18,7 +18,7 @@ export const THEMES = {
 
   // 🌌 Ancien thème sombre bleu
   darkBlue: {
-    label: "Dark Blue (old)",
+    label: "Dark Blue (v1)",
     screenGradient: ["#0a2472", "#000000"],
     appBg: "#000000",
     card: "#0B0B0F",
@@ -31,12 +31,108 @@ export const THEMES = {
     success: "#22c55e",
     tabBg: "#0B0B0F",
   },
+  // ❄️ Winter (hiver clair, glacé)
+winter: {
+  label: "Winter",
+  screenGradient: ["#F0F9FF", "#E0F2FE", "#BFDBFE"], // givre → azur clair → bleu glacé
+  appBg: "#F8FAFC",     // blanc bleuté
+  card: "#ECF5FF",      // carte très claire
+  surface: "#E0F2FE",   // surface azur pâle
+  border: "#93C5FD",    // contour bleu froid
+  text: "#0F172A",      // texte ardoise foncé (lisible)
+  sub: "#475569",       // sous-texte ardoise
+  accent: "#60A5FA",    // bleu “glace” pour boutons
+  accentSoft: "rgba(96,165,250,0.20)",
+  success: "#22C55E",   // vert discret pour succès
+  tabBg: "#ECF5FF",     // onglets assortis, clairs
+},
 
 
 
-  // 🌊 Océan (sombre turquoise)
+// 🐠 Aqua (bleu frutiger aero)
+Aqua: {
+  label: "Aqua Frutiger",
+  screenGradient: ["#B3E5FC", "#4DD0E1", "#00ACC1"], // bleu clair → turquoise → cyan profond
+  appBg: "#E0F7FA",         // fond clair légèrement aqua
+  card: "#CCFBF1",          // cartes translucides
+  surface: "#B2EBF2",       // surface plus lumineuse
+  border: "#4DD0E1",        // contours bleus doux
+  text: "#00363A",          // texte bleu foncé
+  sub: "#0277BD",           // sous-texte bleu moyen
+  accent: "#00BCD4",        // cyan vibrant pour boutons et liens
+  accentSoft: "rgba(0,188,212,0.25)", // effet “verre” léger
+  success: "#2DD4BF",       // vert-menthe typique Aero
+  tabBg: "#B2EBF2",         // fond d’onglets clair
+},
+
+   // 🌸 Sakura Petals (rose pastel lumineux)
+  sakuraPetals: {
+    label: "Sakura Petals",
+    screenGradient: ["#F9A8D4", "#F472B6", "#EC4899"],
+    appBg: "#FDF2F8",
+    card: "#FCE7F3",
+    surface: "#FBCFE8",
+    border: "#F9A8D4",
+    text: "#3F1D2E",
+    sub: "#9D6389",
+    accent: "#DB2777",
+    accentSoft: "rgba(219,39,119,0.2)",
+    success: "#16A34A",
+    tabBg: "#FBCFE8",
+  },
+
+  // 💜 Violet (mauve doux et apaisant)
+Amethyst: {
+  label: "Amethyst",
+  screenGradient: ["#C084FC", "#9333EA", "#6D28D9"],
+  appBg: "#F5F3FF",
+  card: "#EDE9FE",
+  surface: "#DDD6FE",
+  border: "#876debff",
+  text: "#2e1065ff",
+  sub: "#7C3AED",
+  accent: "#8B5CF6",//
+  accentSoft: "rgba(115, 101, 246, 0.15)",//
+  success: "#22C55E",
+  tabBg: "#feede9ff",
+},
+
+   // 🎋 Bamboo (vert fluo)
+  coolGreen: {
+    label: "Bamboo",
+    screenGradient: ["#A7F3D0", "#10B981"],
+    appBg: "#ECFDF5",
+    card: "#D1FAE5",
+    surface: "#A7F3D0",
+    border: "#6EE7B7",
+    text: "#064E3B",
+    sub: "#047857",
+    accent: "#10B981",
+    accentSoft: "rgba(16,185,129,0.15)",
+    success: "#15803D",
+    tabBg: "#D1FAE5",
+  },
+
+  // 🌇 Autumn Fall (coucher de soleil chaud)
+autumnFall: {
+  label: "Autumn Fall",
+  screenGradient: ["#FFEDD5", "#FB923C", "#EA580C"], // dégradé crème → orange doux → orange profond
+  appBg: "#FFF7ED", // fond clair légèrement chaud
+  card: "#FED7AA", // cartes orange pâle
+  surface: "#FDBA74", // surfaces lumineuses
+  border: "#F97316", // contour orange vif
+  text: "#3C1E0A", // texte brun très foncé (lisible)
+  sub: "#9A3412", // sous-texte orange sombre
+  accent: "#F97316", // orange principal éclatant
+  accentSoft: "rgba(249,115,22,0.25)", // accent adouci
+  success: "#16A34A", // vert équilibré
+  tabBg: "#FED7AA", // fond onglets doux
+},
+
+
+// Océan (sombre turquoise)
   oceanDark: {
-    label: "Ocean Dark",
+    label: "Obsidian Ocean",
     screenGradient: ["#022C22", "#000000"],
     appBg: "#000000",
     card: "#071A1A",
@@ -51,100 +147,19 @@ export const THEMES = {
   },
 
   // 🖤 Full Black
-  black: {
-    label: "Black",
-    screenGradient: ["#0B0B0B", "#000000"],
-    appBg: "#000000",
-    card: "#0B0B0F",
-    surface: "#0F1115",
-    border: "#1a1a1a",
-    text: "#FFFFFF",
-    sub: "#A3A3A3",
-    accent: "#F5F5F5",
-    accentSoft: "rgba(245,245,245,0.08)",
-    success: "#16A34A",
-    tabBg: "#0B0B0F",
-  },
-
-
-  // 🌲 Forest (vert sombre)
-  forest: {
-    label: "Forest",
-    screenGradient: ["#0B3D2E", "#00140E"],
-    appBg: "#00140E",
-    card: "#0C2C23",
-    surface: "#10362C",
-    border: "#164B3C",
-    text: "#E8FFF8",
-    sub: "#A7F3D0",
-    accent: "#22C55E",
-    accentSoft: "rgba(34,197,94,0.15)",
-    success: "#22C55E",
-    tabBg: "#0C2C23",
-  },
-
-
-    // 💙 Sky Deep (bleu ciel lumineux sans blanc)
-  skyDeep: {
-    label: "Sky Deep",
-    screenGradient: ["#3B82F6", "#0C4A6E"],
-    appBg: "#082F49",
-    card: "#0E3A60",
-    surface: "#0F4470",
-    border: "#1E40AF",
-    text: "#E0F2FE",
-    sub: "#93C5FD",
-    accent: "#38BDF8",
-    accentSoft: "rgba(59,130,246,0.15)",
-    success: "#16A34A",
-    tabBg: "#0C4A6E",
-  },
-
-  // 🌇 Sunset Orange (coucher de soleil chaud)
-  sunsetOrange: {
-    label: "Sunset Orange",
-    screenGradient: ["#FDBA74", "#9A3412"],
-    appBg: "#7C2D12",
-    card: "#9A3412",
-    surface: "#B45309",
-    border: "#78350F",
-    text: "#FFF7ED",
-    sub: "#FED7AA",
-    accent: "#F97316",
-    accentSoft: "rgba(249,115,22,0.2)",
-    success: "#16A34A",
-    tabBg: "#9A3412",
-  },
-
-   // 🌸 Candy Rose (rose pastel lumineux)
-  candyRose: {
-    label: "Candy Rose",
-    screenGradient: ["#F9A8D4", "#F472B6", "#EC4899"],
-    appBg: "#FDF2F8",
-    card: "#FCE7F3",
-    surface: "#FBCFE8",
-    border: "#F9A8D4",
-    text: "#3F1D2E",
-    sub: "#9D6389",
-    accent: "#DB2777",
-    accentSoft: "rgba(219,39,119,0.2)",
-    success: "#16A34A",
-    tabBg: "#FBCFE8",
-  },
- // 🌿 Emerald Faith (vert apaisant et clair)
-  emeraldFaith: {
-    label: "Emerald Faith",
-    screenGradient: ["#A7F3D0", "#10B981"],
-    appBg: "#ECFDF5",
-    card: "#D1FAE5",
-    surface: "#A7F3D0",
-    border: "#6EE7B7",
-    text: "#064E3B",
-    sub: "#047857",
-    accent: "#10B981",
-    accentSoft: "rgba(16,185,129,0.15)",
-    success: "#15803D",
-    tabBg: "#D1FAE5",
-  },
+black: {
+  label: "Shadow",
+  screenGradient: ["#000000", "#0B0B0B"],
+  appBg: "#000000",
+  card: "#0C0C0C",
+  surface: "#121212",
+  border: "#1E1E1E",
+  text: "#FFFFFF",
+  sub: "#9CA3AF",
+  accent: "#6b787cff",           // 🔹 boutons sombres (pas blancs)
+  accentSoft: "rgba(255,255,255,0.08)", 
+  success: "#16A34A",          // vert discret pour validation
+  tabBg: "#0B0B0B",
+},
 
 };
