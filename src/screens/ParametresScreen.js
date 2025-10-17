@@ -260,6 +260,121 @@ export default function ParametresScreen() {
             </Pressable>
           </View>
 
+                    {/* ---------- Sélecteur de thèmes ---------- */}
+          <View
+            style={{
+              backgroundColor: THEME.card,
+              borderColor: THEME.border,
+              borderWidth: 1,
+              padding: 16,
+              borderRadius: 16,
+              marginBottom: 22,
+            }}
+          >
+            <SectionHeader
+              icon="color-palette-outline"
+              title={t("settings.theme.title")}
+              subtitle={t("settings.theme.subtitle")}
+            />
+
+            {/* Grille de thèmes */}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+              {Object.keys(THEMES).map((key) => {
+                const tTheme = THEMES[key];
+                const active = key === themeKey;
+                return (
+                  <Pressable
+                    key={key}
+                    onPress={() => setThemeKey(key)}
+                    style={{
+                      width: "47%",
+                      backgroundColor: tTheme.card,
+                      borderWidth: 2,
+                      borderColor: active ? tTheme.accent : THEME.border,
+                      borderRadius: 14,
+                      padding: 12,
+                    }}
+                  >
+                    <LinearGradient
+                      colors={tTheme.screenGradient}
+                      style={{
+                        height: 56,
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        marginBottom: 10,
+                        borderWidth: 1,
+                        borderColor: THEME.border,
+                      }}
+                    />
+                    <Text style={{ color: tTheme.accent, fontWeight: "800" }}>
+                      {tTheme.label}
+                    </Text>
+                    <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: tTheme.accent,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: tTheme.card,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
+                      <View
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: 4,
+                          backgroundColor: tTheme.appBg,
+                          borderWidth: 1,
+                          borderColor: THEME.border,
+                        }}
+                      />
+                    </View>
+
+                    {active && (
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 10,
+                          backgroundColor: tTheme.accent,
+                          paddingHorizontal: 8,
+                          paddingVertical: 2,
+                          borderRadius: 999,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#fff",
+                            fontSize: 12,
+                            fontWeight: "800",
+                          }}
+                        >
+                          {t("common.active")}
+                        </Text>
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 12 }}>
+              {t("settings.theme.saved")}
+            </Text>
+          </View>
+
           {/* ---------- SECTION NOTIFS PRIÈRES ---------- */}
           <View
             style={{
@@ -385,121 +500,7 @@ export default function ParametresScreen() {
             </Text>
           </View>
 
-          {/* ---------- Sélecteur de thèmes ---------- */}
-          <View
-            style={{
-              backgroundColor: THEME.card,
-              borderColor: THEME.border,
-              borderWidth: 1,
-              padding: 16,
-              borderRadius: 16,
-              marginBottom: 22,
-            }}
-          >
-            <SectionHeader
-              icon="color-palette-outline"
-              title={t("settings.theme.title")}
-              subtitle={t("settings.theme.subtitle")}
-            />
-
-            {/* Grille de thèmes */}
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-              {Object.keys(THEMES).map((key) => {
-                const tTheme = THEMES[key];
-                const active = key === themeKey;
-                return (
-                  <Pressable
-                    key={key}
-                    onPress={() => setThemeKey(key)}
-                    style={{
-                      width: "47%",
-                      backgroundColor: tTheme.card,
-                      borderWidth: 2,
-                      borderColor: active ? tTheme.accent : THEME.border,
-                      borderRadius: 14,
-                      padding: 12,
-                    }}
-                  >
-                    <LinearGradient
-                      colors={tTheme.screenGradient}
-                      style={{
-                        height: 56,
-                        borderRadius: 10,
-                        overflow: "hidden",
-                        marginBottom: 10,
-                        borderWidth: 1,
-                        borderColor: THEME.border,
-                      }}
-                    />
-                    <Text style={{ color: tTheme.accent, fontWeight: "800" }}>
-                      {tTheme.label}
-                    </Text>
-                    <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
-                      <View
-                        style={{
-                          width: 16,
-                          height: 16,
-                          borderRadius: 4,
-                          backgroundColor: tTheme.accent,
-                          borderWidth: 1,
-                          borderColor: THEME.border,
-                        }}
-                      />
-                      <View
-                        style={{
-                          width: 16,
-                          height: 16,
-                          borderRadius: 4,
-                          backgroundColor: tTheme.card,
-                          borderWidth: 1,
-                          borderColor: THEME.border,
-                        }}
-                      />
-                      <View
-                        style={{
-                          width: 16,
-                          height: 16,
-                          borderRadius: 4,
-                          backgroundColor: tTheme.appBg,
-                          borderWidth: 1,
-                          borderColor: THEME.border,
-                        }}
-                      />
-                    </View>
-
-                    {active && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          top: 10,
-                          right: 10,
-                          backgroundColor: tTheme.accent,
-                          paddingHorizontal: 8,
-                          paddingVertical: 2,
-                          borderRadius: 999,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: "#fff",
-                            fontSize: 12,
-                            fontWeight: "800",
-                          }}
-                        >
-                          {t("common.active")}
-                        </Text>
-                      </View>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 12 }}>
-              {t("settings.theme.saved")}
-            </Text>
-          </View>
-
+          
           {/* ---------- À venir ---------- */}
           <View
             style={{
