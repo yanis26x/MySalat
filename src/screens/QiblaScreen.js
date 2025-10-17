@@ -292,11 +292,7 @@ export default function QiblaScreen() {
                 </Text>
               </View>
 
-              {qibla != null && (
-                <Text style={{ color: THEME.sub, marginTop: 8 }}>
-                  {t("direction", { degree: Math.round(qibla) })}
-                </Text>
-              )}
+
             </View>
 
             {/* Metrics */}

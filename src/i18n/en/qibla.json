@@ -4,7 +4,6 @@
   "whyQibla": "Why Qibla?",
   "aligned": "Aligned with the Qibla",
   "notAligned": "Turn toward the Qibla",
-  "direction": "Qibla direction: {{degree}}°",
   "prayerDirectionTitle": "Prayer direction",
   "prayerDirectionText": "We pray facing the Kaaba (Qibla). Stay away from magnetic sources and recalibrate the compass if needed.",
   "modalTitle": "Why do we pray toward the Qibla?",
