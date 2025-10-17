@@ -16,7 +16,7 @@ const ALIGN_TOLERANCE_DEG = 10;
 export default function QiblaScreen() {
   const isFocused = useIsFocused();
   const { THEME } = useTheme26x();
-  const { t } = useTranslation("qibla"); // 👈 namespace qibla
+  const { t } = useTranslation("qibla");
 
   const [loading, setLoading] = useState(true);
   const [qibla, setQibla] = useState(null);
@@ -30,7 +30,7 @@ export default function QiblaScreen() {
   const armedRef = useRef(false);
   const lastAlignedRef = useRef(false);
 
-  // Charger le son
+  // ----- Audio
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -53,9 +53,10 @@ export default function QiblaScreen() {
     };
   }, []);
 
-  // Setup capteurs
+  // ----- Capteurs + GPS
   useEffect(() => {
     let cancelled = false;
+
     const setupAsync = async () => {
       if (!isFocused) {
         armedRef.current = false;
@@ -78,10 +79,12 @@ export default function QiblaScreen() {
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
+
         const places = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
-        const prettyCity = places.length > 0
-          ? places[0].city || places[0].region || places[0].country || "Unknown"
-          : "Unknown";
+        const prettyCity =
+          places.length > 0
+            ? places[0].city || places[0].region || places[0].country || "Unknown"
+            : "Unknown";
         setCity(prettyCity);
 
         const qb = qiblaBearing(lat, lon);
@@ -105,6 +108,7 @@ export default function QiblaScreen() {
         if (!cancelled) setLoading(false);
       }
     };
+
     setupAsync();
     return () => {
       cancelled = true;
@@ -116,11 +120,12 @@ export default function QiblaScreen() {
     };
   }, [isFocused]);
 
-  // Détection alignement
+  // ----- Détection alignement
   useEffect(() => {
     if (!isFocused || !armedRef.current || qibla == null) return;
     const diff = Math.abs(((qibla - heading + 540) % 360) - 180);
     const aligned = diff < ALIGN_TOLERANCE_DEG;
+
     if (aligned && !lastAlignedRef.current) {
       lastAlignedRef.current = true;
       setIsFacingQibla(true);
@@ -131,8 +136,13 @@ export default function QiblaScreen() {
     }
   }, [heading, qibla, isFocused]);
 
-  const arrowAngle = useMemo(() => (qibla != null ? (qibla - heading + 360) % 360 : 0), [qibla, heading]);
+  // ----- Angle flèche
+  const arrowAngle = useMemo(
+    () => (qibla != null ? (qibla - heading + 360) % 360 : 0),
+    [qibla, heading]
+  );
 
+  // ----- UI
   if (loading) {
     return (
       <LinearGradient colors={THEME.screenGradient} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -145,9 +155,37 @@ export default function QiblaScreen() {
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
+       {/* === FAB WHY (nouvelle place / corrigée) === */}
+<Pressable
+  onPress={() => setWhyOpen(true)}
+  accessibilityRole="button"
+  accessibilityLabel={t("whyQibla")}
+  style={{
+    position: "absolute",
+    top: 60, // ↓↓↓ abaissé (avant c'était 8)
+    right: 16,
+    zIndex: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: THEME.card,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
+  }}
+>
+  <Ionicons name="help-circle" size={22} color={THEME.accent} />
+</Pressable>
+
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 24 }}>
           {/* Header */}
-          <View style={{ alignItems: "center", marginBottom: 12 }}>
+          <View style={{ alignItems: "center", marginBottom: 14 }}>
             <Text style={{ color: THEME.text, fontSize: 26, fontWeight: "800" }}>{t("title")}</Text>
 
             <View
@@ -167,52 +205,36 @@ export default function QiblaScreen() {
               <Ionicons name="location" size={14} color={THEME.accent} />
               <Text style={{ color: THEME.text, fontSize: 13, fontWeight: "700" }}>{city}</Text>
             </View>
-
-            {/* Bouton "Pourquoi la Qibla ?" */}
-            <Pressable
-              onPress={() => setWhyOpen(true)}
-              style={{
-                marginTop: 12,
-                paddingHorizontal: 14,
-                paddingVertical: 8,
-                borderRadius: 999,
-                borderWidth: 1,
-                borderColor: THEME.border,
-                backgroundColor: THEME.card,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <Ionicons name="help-circle-outline" size={16} color={THEME.accent} />
-              <Text style={{ color: THEME.text, fontWeight: "800" }}>{t("whyQibla")}</Text>
-            </Pressable>
           </View>
 
           {/* Boussole + statut */}
-          <View style={{ alignItems: "center", marginTop: 6 }}>
+          <View style={{ alignItems: "center" }}>
             <View
               style={{
-                width: 260,
-                height: 260,
-                borderRadius: 130,
+                width: 300,
+                height: 300,
+                borderRadius: 150,
+                alignItems: "center",
+                justifyContent: "center",
                 backgroundColor: THEME.card,
                 borderWidth: 1,
                 borderColor: THEME.border,
-                alignItems: "center",
-                justifyContent: "center",
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 8 },
               }}
             >
               <View
                 style={{
-                  width: 220,
-                  height: 220,
-                  borderRadius: 110,
+                  width: 256,
+                  height: 256,
+                  borderRadius: 128,
+                  backgroundColor: THEME.surface,
                   borderWidth: 1,
                   borderColor: THEME.border,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: THEME.surface,
                 }}
               >
                 {[...Array(12)].map((_, i) => (
@@ -220,22 +242,23 @@ export default function QiblaScreen() {
                     key={i}
                     style={{
                       position: "absolute",
-                      top: 6,
+                      top: 8,
                       width: 2,
-                      height: i % 3 === 0 ? 16 : 10,
+                      height: i % 3 === 0 ? 18 : 10,
                       backgroundColor: i % 3 === 0 ? THEME.accent : THEME.border,
                       transform: [{ rotate: `${i * 30}deg` }],
                     }}
                   />
                 ))}
+
                 <View
                   style={{
                     position: "absolute",
                     width: 0,
                     height: 0,
-                    borderLeftWidth: 12,
-                    borderRightWidth: 12,
-                    borderBottomWidth: 80,
+                    borderLeftWidth: 14,
+                    borderRightWidth: 14,
+                    borderBottomWidth: 92,
                     borderLeftColor: "transparent",
                     borderRightColor: "transparent",
                     borderBottomColor: isFacingQibla ? THEME.success : THEME.accent,
@@ -245,14 +268,14 @@ export default function QiblaScreen() {
               </View>
             </View>
 
-            <View style={{ alignItems: "center", marginTop: 14 }}>
+            <View style={{ alignItems: "center", marginTop: 16 }}>
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
+                  paddingHorizontal: 14,
+                  paddingVertical: 8,
                   borderRadius: 999,
                   borderWidth: 1,
                   borderColor: isFacingQibla ? THEME.success : THEME.border,
@@ -261,7 +284,7 @@ export default function QiblaScreen() {
               >
                 <Ionicons
                   name={isFacingQibla ? "checkmark-circle" : "ellipse-outline"}
-                  size={16}
+                  size={18}
                   color={isFacingQibla ? THEME.success : THEME.sub}
                 />
                 <Text style={{ color: isFacingQibla ? THEME.success : THEME.text, fontWeight: "800" }}>
@@ -270,34 +293,59 @@ export default function QiblaScreen() {
               </View>
 
               {qibla != null && (
-                <Text style={{ color: THEME.sub, marginTop: 6 }}>
+                <Text style={{ color: THEME.sub, marginTop: 8 }}>
                   {t("direction", { degree: Math.round(qibla) })}
                 </Text>
               )}
             </View>
+
+            {/* Metrics */}
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                marginTop: 16,
+                width: "100%",
+                justifyContent: "center",
+              }}
+            >
+              <MetricPill THEME={THEME} icon="compass-outline" value={`${Math.round(heading)}°`} hint="Heading" />
+              <MetricPill THEME={THEME} icon="locate-outline" value={qibla != null ? `${Math.round(qibla)}°` : "--"} hint="Qibla" />
+              <MetricPill
+                THEME={THEME}
+                icon="swap-vertical-outline"
+                value={
+                  qibla != null
+                    ? `${Math.abs(Math.round((((qibla - heading + 540) % 360) - 180)))}°`
+                    : "--"
+                }
+                hint="Offset"
+              />
+            </View>
           </View>
 
-          {/* Info carte */}
+          {/* Info card */}
           <View
             style={{
               backgroundColor: THEME.card,
               borderColor: THEME.border,
               borderWidth: 1,
-              borderRadius: 14,
-              padding: 14,
+              borderRadius: 16,
+              padding: 16,
               marginTop: 22,
             }}
           >
-            <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800", marginBottom: 4 }}>
-              {t("prayerDirectionTitle")}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <Ionicons name="information-circle-outline" size={18} color={THEME.accent} />
+              <Text style={{ color: THEME.text, fontSize: 16, fontWeight: "800" }}>{t("prayerDirectionTitle")}</Text>
+            </View>
             <Text style={{ color: THEME.sub }}>{t("prayerDirectionText")}</Text>
           </View>
 
           <Footer />
         </ScrollView>
 
-        {/* MODAL: Pourquoi la Qibla ? */}
+        {/* Modal WHY */}
         <Modal visible={whyOpen} animationType="slide" transparent onRequestClose={() => setWhyOpen(false)}>
           <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "flex-end" }}>
             <View
@@ -347,5 +395,28 @@ export default function QiblaScreen() {
         </Modal>
       </SafeAreaView>
     </LinearGradient>
+  );
+}
+
+function MetricPill({ THEME, icon, value, hint }) {
+  return (
+    <View
+      style={{
+        minWidth: 92,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: THEME.border,
+        backgroundColor: THEME.card,
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+      }}
+    >
+      <Ionicons name={icon} size={16} color={THEME.sub} />
+      <Text style={{ color: THEME.text, fontWeight: "800", fontSize: 16 }}>{value}</Text>
+      <Text style={{ color: THEME.sub, fontSize: 11 }}>{hint}</Text>
+    </View>
   );
 }
