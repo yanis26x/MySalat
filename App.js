@@ -181,10 +181,10 @@ function HomeScreen() {
 
   const greet = useMemo(() => {
     const h = now.getHours();
-    if (h < 6) return "Assalâm ‘alaykum";
-    if (h < 12) return "Sabah el kheir";
-    if (h < 18) return "Assalâm ‘alaykum";
-    return "Bonsoir";
+    if (h < 6) return "Salut, tu dors pas?!";
+    if (h < 12) return "Bon matin ☀️";
+    if (h < 18) return "Bonne journée !";
+    return "Bonne soirée 🌙";
   }, [now]);
 
   function fmtCountdown(target) {
