@@ -22,19 +22,18 @@ import { getPrayerTimesForDate } from "../prayerTimes";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import Footer from "../components/Footer";
 
+// 🆕 i18n
+import "../i18n/i18n"; // s'assure que i18n est initialisé
+import i18n from "../i18n/i18n";
+import { useTranslation } from "react-i18next";
+
 const INSTAGRAM_USER = "yanis26x";
 const GITHUB_USER = "yanis26x";
 const LINKEDIN_URL = "https://www.linkedin.com/in/yanis-djenadi-058964307/";
 
 const PRAYERS = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
-const PRAYER_LABELS = {
-  fajr: "Fajr",
-  dhuhr: "Dhuhr",
-  asr: "Asr",
-  maghrib: "Maghrib",
-  isha: "Isha",
-};
 const PREFS_KEY = "notifPrefs26x";
+const LANG_KEY = "appLang26x";
 
 /* ---------- Helpers ---------- */
 function SectionHeader({ icon, title, subtitle }) {
@@ -63,8 +62,8 @@ async function openExternal(urls) {
     await Linking.openURL(urls.web);
   } catch {
     Alert.alert(
-      "Ouverture impossible",
-      "Vérifie que l’app ou le navigateur est disponible."
+      i18n.t("alert.openFail.title"),
+      i18n.t("alert.openFail.body")
     );
   }
 }
@@ -74,8 +73,8 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
   const perm = await Notifications.requestPermissionsAsync();
   if (perm.status !== "granted") {
     Alert.alert(
-      "Notifications désactivées",
-      "Autorise les notifications pour recevoir les rappels."
+      i18n.t("alert.notifsOff.title"),
+      i18n.t("alert.notifsOff.body")
     );
     return;
   }
@@ -84,8 +83,8 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
     await Location.requestForegroundPermissionsAsync();
   if (locStatus !== "granted") {
     Alert.alert(
-      "Localisation requise",
-      "Active la localisation pour calculer les horaires."
+      i18n.t("alert.locationReq.title"),
+      i18n.t("alert.locationReq.body")
     );
     return;
   }
@@ -117,8 +116,8 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
       try {
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: "🕌 MySalat",
-            body: `C’est l’heure de ${PRAYER_LABELS[key]}`,
+            title: i18n.t("notif.title"),
+            body: i18n.t("notif.bodyPrayer", { name: i18n.t(`prayers.${key}`) }),
             sound: true,
           },
           trigger: { date: at },
@@ -130,12 +129,13 @@ async function rescheduleNextDaysWithPrefs(prefs, days = 7) {
   }
 
   Alert.alert(
-    "Rappels mis à jour",
-    `Notifications planifiées selon tes préférences (${days} jours).`
+    i18n.t("alert.rescheduled.title"),
+    i18n.t("alert.rescheduled.body", { days })
   );
 }
 
 export default function ParametresScreen() {
+  const { t, i18n: i18next } = useTranslation();
   const { THEME, themeKey, setThemeKey, THEMES } = useTheme26x();
   const tabBarHeight = useBottomTabBarHeight();
 
@@ -147,6 +147,18 @@ export default function ParametresScreen() {
     maghrib: true,
     isha: true,
   });
+
+  // 🔐 Charger la langue sauvegardée au démarrage de l’écran
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem(LANG_KEY);
+        if (saved && saved !== i18next.language) {
+          await i18next.changeLanguage(saved);
+        }
+      } catch {}
+    })();
+  }, [i18next]);
 
   useEffect(() => {
     (async () => {
@@ -186,41 +198,66 @@ export default function ParametresScreen() {
         },
         trigger: { seconds: 5 },
       });
-      Alert.alert("Ok", "Une notification de test arrive dans 5s.");
+      Alert.alert(t("alert.test.ok"), t("alert.test.scheduled"));
     } catch (e) {
       console.error("Test notification error:", e);
-      Alert.alert("Erreur", "Impossible de programmer une notification test.");
+      Alert.alert(t("alert.test.errorTitle"), t("alert.test.errorBody"));
     }
   }
 
   const THEME_KEYS = Object.keys(THEMES);
 
+  // 🆕 Bouton de langue
+  const toggleLanguage = async () => {
+    const next = i18next.language === "fr" ? "en" : "fr";
+    await i18next.changeLanguage(next);
+    await AsyncStorage.setItem(LANG_KEY, next);
+  };
+
   return (
     <LinearGradient colors={THEME.screenGradient} style={{ flex: 1 }}>
-      {/* ✅ top seulement pour éviter le “rectangle” en bas */}
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
             padding: 20,
-            // ✅ on réserve l’espace de la tab bar pour ne rien masquer
             paddingBottom: tabBarHeight + 16,
           }}
           showsVerticalScrollIndicator={false}
-          // (facultatif) si Android te pousse encore le contenu :
-          // contentInsetAdjustmentBehavior="never"
         >
-          {/* Header */}
+          {/* Header + bouton langue */}
           <View style={{ marginBottom: 18, alignItems: "center" }}>
             <Text
               style={{ color: THEME.text, fontSize: 28, fontWeight: "800" }}
             >
-              Paramètres
+              {t("settings.title")}
             </Text>
             <Text
               style={{ color: THEME.sub, marginTop: 6, textAlign: "center" }}
             >
               @yanis26x
             </Text>
+
+            {/* 🔘 Lang switch */}
+            <Pressable
+              onPress={toggleLanguage}
+              style={{
+                marginTop: 12,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                paddingVertical: 8,
+                paddingHorizontal: 14,
+                borderRadius: 999,
+                backgroundColor: THEME.accentSoft,
+                borderWidth: 1,
+                borderColor: THEME.accent,
+              }}
+            >
+              <Ionicons name="globe-outline" size={18} color={THEME.accent} />
+              <Text style={{ color: THEME.accent, fontWeight: "800" }}>
+                {i18next.language === "fr" ? t("lang.to_en") : t("lang.to_fr")}
+              </Text>
+            </Pressable>
           </View>
 
           {/* ---------- SECTION NOTIFS PRIÈRES ---------- */}
@@ -236,8 +273,8 @@ export default function ParametresScreen() {
           >
             <SectionHeader
               icon="notifications-outline"
-              title="Notifications de prière"
-              subtitle="Active/désactive les rappels pour chaque prière"
+              title={t("settings.notifications.title")}
+              subtitle={t("settings.notifications.subtitle")}
             />
 
             {PRAYERS.map((k, idx) => (
@@ -277,7 +314,7 @@ export default function ParametresScreen() {
                       textTransform: "capitalize",
                     }}
                   >
-                    {PRAYER_LABELS[k]}
+                    {t(`prayers.${k}`)}
                   </Text>
                 </View>
 
@@ -303,7 +340,7 @@ export default function ParametresScreen() {
                 }}
               >
                 <Text style={{ color: "#fff", fontWeight: "800" }}>
-                  Tout activer
+                  {t("actions.enableAll")}
                 </Text>
               </Pressable>
 
@@ -320,7 +357,7 @@ export default function ParametresScreen() {
                 }}
               >
                 <Text style={{ color: THEME.text, fontWeight: "800" }}>
-                  Tout désactiver
+                  {t("actions.disableAll")}
                 </Text>
               </Pressable>
             </View>
@@ -339,12 +376,12 @@ export default function ParametresScreen() {
               }}
             >
               <Text style={{ color: THEME.accent, fontWeight: "800" }}>
-                Replanifier maintenant (7 jours)
+                {t("actions.reschedule7d")}
               </Text>
             </Pressable>
 
             <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 8 }}>
-              Lève-toi pour Fajr, ne rate pas les autres prières non plus !
+              {t("tips.fajr")}
             </Text>
           </View>
 
@@ -361,14 +398,14 @@ export default function ParametresScreen() {
           >
             <SectionHeader
               icon="color-palette-outline"
-              title="Thème"
-              subtitle="Choisis le style de l’app"
+              title={t("settings.theme.title")}
+              subtitle={t("settings.theme.subtitle")}
             />
 
             {/* Grille de thèmes */}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
               {Object.keys(THEMES).map((key) => {
-                const t = THEMES[key];
+                const tTheme = THEMES[key];
                 const active = key === themeKey;
                 return (
                   <Pressable
@@ -376,15 +413,15 @@ export default function ParametresScreen() {
                     onPress={() => setThemeKey(key)}
                     style={{
                       width: "47%",
-                      backgroundColor: t.card,
+                      backgroundColor: tTheme.card,
                       borderWidth: 2,
-                      borderColor: active ? t.accent : THEME.border,
+                      borderColor: active ? tTheme.accent : THEME.border,
                       borderRadius: 14,
                       padding: 12,
                     }}
                   >
                     <LinearGradient
-                      colors={t.screenGradient}
+                      colors={tTheme.screenGradient}
                       style={{
                         height: 56,
                         borderRadius: 10,
@@ -394,8 +431,8 @@ export default function ParametresScreen() {
                         borderColor: THEME.border,
                       }}
                     />
-                    <Text style={{ color: t.accent, fontWeight: "800" }}>
-                      {t.label}
+                    <Text style={{ color: tTheme.accent, fontWeight: "800" }}>
+                      {tTheme.label}
                     </Text>
                     <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
                       <View
@@ -403,7 +440,7 @@ export default function ParametresScreen() {
                           width: 16,
                           height: 16,
                           borderRadius: 4,
-                          backgroundColor: t.accent,
+                          backgroundColor: tTheme.accent,
                           borderWidth: 1,
                           borderColor: THEME.border,
                         }}
@@ -413,7 +450,7 @@ export default function ParametresScreen() {
                           width: 16,
                           height: 16,
                           borderRadius: 4,
-                          backgroundColor: t.card,
+                          backgroundColor: tTheme.card,
                           borderWidth: 1,
                           borderColor: THEME.border,
                         }}
@@ -423,7 +460,7 @@ export default function ParametresScreen() {
                           width: 16,
                           height: 16,
                           borderRadius: 4,
-                          backgroundColor: t.appBg,
+                          backgroundColor: tTheme.appBg,
                           borderWidth: 1,
                           borderColor: THEME.border,
                         }}
@@ -436,7 +473,7 @@ export default function ParametresScreen() {
                           position: "absolute",
                           top: 10,
                           right: 10,
-                          backgroundColor: t.accent,
+                          backgroundColor: tTheme.accent,
                           paddingHorizontal: 8,
                           paddingVertical: 2,
                           borderRadius: 999,
@@ -449,7 +486,7 @@ export default function ParametresScreen() {
                             fontWeight: "800",
                           }}
                         >
-                          Actif
+                          {t("common.active")}
                         </Text>
                       </View>
                     )}
@@ -459,12 +496,9 @@ export default function ParametresScreen() {
             </View>
 
             <Text style={{ color: THEME.sub, fontSize: 12, marginTop: 12 }}>
-              Le thème est enregistré automatiquement et appliqué à tous les
-              écrans.
+              {t("settings.theme.saved")}
             </Text>
           </View>
-
-      
 
           {/* ---------- À venir ---------- */}
           <View
@@ -482,13 +516,9 @@ export default function ParametresScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader icon="information-circle-outline" title="À venir.." />
+            <SectionHeader icon="information-circle-outline" title={t("coming.title")} />
             <Text style={{ color: THEME.text, fontSize: 16, lineHeight: 22 }}>
-  La plupart des applications de prière vous bombardent de publicités, alors que vous souhaitez simplement une application légère pour vous rappeler les horaires de prière et la direction de la Qibla. 
-  C’est pourquoi je vais ajouter un bouton : une publicité ne s’affichera que si vous appuyez dessus.
-  {"\n\n"}
-  Je fais cette fonctionnalité pour vous donner la possibilité de soutenir le développement de l’application si vous en avez le temps et l’envie. 
-  Je ne vous oblige à rien ; les hassanates que j’obtiens me suffisent largement !
+              {t("coming.body")}
             </Text>
           </View>
 
@@ -508,7 +538,11 @@ export default function ParametresScreen() {
               elevation: 2,
             }}
           >
-            <SectionHeader icon="heart-outline" title="Follow me" subtitle="Let’s connect" />
+            <SectionHeader
+              icon="heart-outline"
+              title={t("follow.title")}
+              subtitle={t("follow.subtitle")}
+            />
 
             {/* Instagram */}
             <Pressable
@@ -536,7 +570,7 @@ export default function ParametresScreen() {
               <Ionicons name="logo-instagram" size={22} color={THEME.text} />
               <View style={{ flex: 1 }}>
                 <Text style={{ color: THEME.text, fontWeight: "700" }}>
-                  Instagram
+                  {t("follow.instagram")}
                 </Text>
                 <Text style={{ color: THEME.sub }}>@{INSTAGRAM_USER}</Text>
               </View>
@@ -561,7 +595,7 @@ export default function ParametresScreen() {
               <Ionicons name="logo-github" size={22} color={THEME.text} />
               <View style={{ flex: 1 }}>
                 <Text style={{ color: THEME.text, fontWeight: "700" }}>
-                  GitHub
+                  {t("follow.github")}
                 </Text>
                 <Text style={{ color: THEME.sub }}>@{GITHUB_USER}</Text>
               </View>
@@ -569,34 +603,35 @@ export default function ParametresScreen() {
             </Pressable>
 
             {/* 🌐 Site Web */}
-<Pressable
-  onPress={() => Linking.openURL("https://yanis26x.github.io/yanis26x/")}
-  style={{
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    borderRadius: 12,
-    borderColor: THEME.border,
-    borderWidth: 1,
-    marginBottom: 10,
-    gap: 12,
-    backgroundColor: THEME.surface,
-  }}
->
-  {/* Ton logo PNG à la place de Ionicons */}
-  <Image
-    source={require("../../assets/26xLogo.png")} // ← change le chemin selon ton projet
-    style={{ width: 24, height: 24, borderRadius: 6 }}
-    resizeMode="contain"
-  />
+            <Pressable
+              onPress={() => Linking.openURL("https://yanis26x.github.io/yanis26x/")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 14,
+                borderRadius: 12,
+                borderColor: THEME.border,
+                borderWidth: 1,
+                marginBottom: 10,
+                gap: 12,
+                backgroundColor: THEME.surface,
+              }}
+            >
+              <Image
+                source={require("../../assets/26xLogo.png")}
+                style={{ width: 24, height: 24, borderRadius: 6 }}
+                resizeMode="contain"
+              />
 
-  <View style={{ flex: 1 }}>
-    <Text style={{ color: THEME.text, fontWeight: "700" }}>Site web</Text>
-    <Text style={{ color: THEME.sub }}>yanis26x.github.io</Text>
-  </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: THEME.text, fontWeight: "700" }}>
+                  {t("follow.website")}
+                </Text>
+                <Text style={{ color: THEME.sub }}>yanis26x.github.io</Text>
+              </View>
 
-  <Ionicons name="open-outline" size={18} color={THEME.sub} />
-</Pressable>
+              <Ionicons name="open-outline" size={18} color={THEME.sub} />
+            </Pressable>
 
             {/* LinkedIn */}
             <Pressable
@@ -615,7 +650,7 @@ export default function ParametresScreen() {
               <Ionicons name="logo-linkedin" size={22} color={THEME.accent} />
               <View style={{ flex: 1 }}>
                 <Text style={{ color: THEME.text, fontWeight: "700" }}>
-                  LinkedIn
+                  {t("follow.linkedin")}
                 </Text>
                 <Text style={{ color: THEME.sub }}>@yanis26x</Text>
               </View>
@@ -636,8 +671,8 @@ export default function ParametresScreen() {
           >
             <SectionHeader
               icon="construct-outline"
-              title="Dev tools"
-              subtitle="Outils internes pendant le dev"
+              title={t("dev.title")}
+              subtitle={t("dev.subtitle")}
             />
             <Pressable
               onPress={testNotification}
@@ -652,11 +687,11 @@ export default function ParametresScreen() {
               }}
             >
               <Text style={{ color: THEME.accent, fontWeight: "700" }}>
-                Tester les notifications
+                {t("dev.testNotif")}
               </Text>
             </Pressable>
           </View>
-          {/* ---------- Footer ---------- */}
+
           <Footer />
         </ScrollView>
       </SafeAreaView>

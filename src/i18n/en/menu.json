@@ -1,0 +1,43 @@
+{
+  "tabs.home": "Home",
+  "tabs.qibla": "Qibla",
+  "tabs.learn": "Learn",
+  "tabs.settings": "Settings",
+
+  "alerts.locationRequired.title": "Location required",
+  "alerts.locationRequired.body": "Enable location to compute prayer times.",
+  "alerts.initError.title": "Error",
+  "alerts.initError.body": "An issue occurred during initialization.",
+
+  "greet.nightOwl": "Hey, still awake?!",
+  "greet.morning": "Good morning ☀️",
+  "greet.afternoon": "Good afternoon!",
+  "greet.evening": "Good evening 🌙",
+
+  "loading.preparingDay": "Preparing your day…",
+
+  "city.unknown": "Unknown",
+
+  "home.nextPrayer.title": "Next prayer",
+  "home.nextPrayer.in": "in {{time}}",
+  "home.nextPrayer.allPassed": "all passed for today",
+  "home.nextPrayer.at": "at",
+  "home.nextPrayer.since": "Since {{prev}} · {{time}}",
+  "home.nextPrayer.towards": "Towards {{next}} · {{time}}",
+
+  "shortcuts.qibla.title": "Qibla",
+  "shortcuts.qibla.subtitle": "Find the direction",
+  "shortcuts.learn.title": "Learn",
+  "shortcuts.learn.subtitle": "Learn & practice",
+  "shortcuts.dua.title": "Dua of the day",
+  "shortcuts.dua.subtitle": "Invocation & sharing",
+
+  "today.title": "Today",
+  "today.error": "Unable to compute prayer times.",
+
+  "upcoming.title": "Next days",
+  "upcoming.legend": "Fajr / Maghrib",
+
+  "common.dot": "·",
+  "common.now": "Now"
+}

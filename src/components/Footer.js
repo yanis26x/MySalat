@@ -1,10 +1,11 @@
-// src/components/Footer.js
 import React, { useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { useTheme26x } from "../themeContext";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
   const { THEME } = useTheme26x();
+  const { t } = useTranslation("footer"); // 👈 namespace footer
   const [visible, setVisible] = useState(false);
   const year = new Date().getFullYear();
 
@@ -31,7 +32,7 @@ export default function Footer() {
             letterSpacing: 0.4,
           }}
         >
-          © {year} yanis26x · Tous droits réservés
+          {t("rights", { year })}
         </Text>
       </Pressable>
 
@@ -69,8 +70,7 @@ export default function Footer() {
                 textAlign: "center",
               }}
             >
-              Fait par yanis djenadi (@yanis26x)
-              {"\n"} I hope you like it! 
+              {t("madeBy")}
             </Text>
           </View>
         </Pressable>

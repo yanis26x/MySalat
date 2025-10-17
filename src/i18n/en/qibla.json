@@ -1,0 +1,16 @@
+{
+  "title": "Qibla",
+  "calibration": "Calibrating compass…",
+  "whyQibla": "Why Qibla?",
+  "aligned": "Aligned with the Qibla",
+  "notAligned": "Turn toward the Qibla",
+  "direction": "Qibla direction: {{degree}}°",
+  "prayerDirectionTitle": "Prayer direction",
+  "prayerDirectionText": "We pray facing the Kaaba (Qibla). Stay away from magnetic sources and recalibrate the compass if needed.",
+  "modalTitle": "Why do we pray toward the Qibla?",
+  "modalText": "• Qibla = direction of the Kaaba in Mecca.\n• It’s a divine command for the unity of Muslims (Qur'an 2:144, 2:150).\n• It unites hearts wherever we are.\n• It helps with focus during prayer.\n• If you do your best to estimate it and make a mistake, the prayer is still valid according to most scholars.",
+  "ok": "Understood",
+  "alertTitle": "Location required",
+  "alertMessage": "Enable location to calculate the Qibla.",
+  "errorInit": "Unable to initialize Qibla compass."
+}
