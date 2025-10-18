@@ -148,8 +148,8 @@ export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) 
 export function VictoryLoading({
   THEME,
   visible,
-  title = "Okayy....",
-  subtitle = "Bank—bankrolls, my funds increasing, yours looking chibi",
+  title = "Terminé",
+  subtitle = "Passe au prochain niveau maintenant",
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade">

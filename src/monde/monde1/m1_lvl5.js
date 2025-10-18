@@ -34,7 +34,7 @@ export default function M1_Lvl5({ onWin, onGameOver }) {
         if (t <= 1) {
           clearInterval(timerRef.current);
           doneRef.current = true;
-          onGameOver?.("Trop lent ! Le temps c'est de largent et toi ta aucun des deux.");
+          onGameOver?.("Trop lent...");
           return 0;
         }
         return t - 1;
@@ -69,14 +69,6 @@ export default function M1_Lvl5({ onWin, onGameOver }) {
         title="Les 5 piliers de l’Islam"
         subtitle={`Temps restant : ${time}s`}
       />
-      {/* <Card THEME={THEME}>
-        <Text style={{ color: THEME.sub }}>
-          Pilier attendu :{" "}
-          <Text style={{ color: THEME.text, fontWeight: "900" }}>
-            {PILLARS[progress]}
-          </Text>
-        </Text>
-      </Card> */}
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
         {shuffled.map((p) => (

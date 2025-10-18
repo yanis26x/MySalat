@@ -111,7 +111,7 @@ export default function PlayScreen() {
             Teste tes connaissances
           </Text>
           <Text style={{ color: THEME.sub, marginBottom: 14 }}>
-            Essaye d'arriver a la fin sans supprimer l'app.... 50$ au premier qui finit le niveau 3
+          50$ au premier qui finit le niveau 3
           </Text>
 
           {/* Monde 1 — déverrouillé */}

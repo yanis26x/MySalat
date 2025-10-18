@@ -19,7 +19,7 @@ export default function M1_Lvl4({ onWin, onGameOver }) {
     const cur = QUESTIONS[idx];
     const ok = ans === cur.expect;
     if (!ok) {
-      onGameOver?.("Mdr ta pas damis ou quoi ? garde la peche");
+      onGameOver?.("garde la peche");
       return;
     }
     if (cur.final) {

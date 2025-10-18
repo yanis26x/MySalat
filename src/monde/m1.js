@@ -16,7 +16,7 @@ import L5 from "./monde1/m1_lvl5";
 import LFinal from "./monde1/m1_final";
 
 export const LEVELS = { L1: 1, L2: 2, L3: 3, L4: 4, L5: 5, FINAL: 6 };
-const VICTORY_DELAY_MS = 5000;
+const VICTORY_DELAY_MS = 3000;
 const SECRET_CODE = "2626266";
 
 export default function M1() {
@@ -74,7 +74,7 @@ export default function M1() {
 
   // 🔥 Helpers
   function triggerGameOver(reason, mock = false) {
-    setOverReason(reason || "");
+    setOverReason(reason || "ugh");
     setOverMock(mock);
     setShowOver(true);
   }
