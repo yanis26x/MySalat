@@ -11,9 +11,9 @@ export default function M1_Final({ onWin, onGameOver }) {
   const [won, setWon] = useState(false);
 
   function tryLuck() {
-    const win = Math.random() < 1 / 3;
+    const win = Math.random() < 1 / 5;
     if (!win) {
-      onGameOver?.("😂 Ooops… à toi de retenter ta chance !");
+      onGameOver?.("ahhahahaahahahahhaa!");
       return;
     }
     setWon(true);

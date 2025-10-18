@@ -49,7 +49,7 @@ export default function M1_Lvl2({ onWin, onGameOver }) {
           shouldDuckAndroid: true,
         });
         const { sound } = await Audio.Sound.createAsync(
-          require("../../../assets/ha-ha.mp3")
+          require("../../../assets/qibla-success.mp3")
         );
         if (mounted) successRef.current = sound;
         else sound.unloadAsync().catch(() => {});
@@ -89,7 +89,7 @@ export default function M1_Lvl2({ onWin, onGameOver }) {
     <View style={{ gap: 12 }}>
       <Section
         THEME={THEME}
-        title="Place les étapes du wudu dans l’ordre"
+        title="Clique sur les etapes en ordre."
       />
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>

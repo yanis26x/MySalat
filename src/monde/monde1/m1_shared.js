@@ -1,4 +1,3 @@
-// src/monde/monde1/m1_shared.js
 import React, { useState } from "react";
 import {
   View,
@@ -16,6 +15,7 @@ export function Card({ THEME, children, style }) {
     <View
       style={[
         {
+          position: "relative", // nécessaire pour positionner la signature
           backgroundColor: THEME.card,
           borderColor: THEME.border,
           borderWidth: 1,
@@ -85,6 +85,25 @@ export function Section({ THEME, title, subtitle }) {
   );
 }
 
+/* -------------------- SIGNATURE (petit logo en haut à droite) -------------------- */
+function SignatureMark() {
+  return (
+    <Image
+      source={require("../../../assets/26xLogo.png")}
+      style={{
+        position: "absolute",
+        top: 10,
+        right: 10,
+        width: 28,
+        height: 28,
+        borderRadius: 6,
+        opacity: 0.95,
+      }}
+      resizeMode="contain"
+    />
+  );
+}
+
 /* -------------------- GAME OVER MODAL -------------------- */
 export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) {
   return (
@@ -98,35 +117,24 @@ export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) 
         }}
       >
         <Card THEME={THEME} style={{ padding: 20 }}>
+          {/* Signature en haut à droite */}
+          <SignatureMark />
+
           <View style={{ alignItems: "center", gap: 10 }}>
-            <View
+            <Text
               style={{
-                width: 110,
-                height: 110,
-                borderRadius: 24,
-                backgroundColor: THEME.surface,
-                borderWidth: 1,
-                borderColor: THEME.border,
-                alignItems: "center",
-                justifyContent: "center",
+                color: THEME.text,
+                fontSize: 17,
+                fontWeight: "900",
+                textAlign: "center",
               }}
             >
-              <Image
-                source={require("../../../assets/26xLogo.png")}
-                style={{ width: 80, height: 80 }}
-                resizeMode="contain"
-              />
-            </View>
-
-            <Text style={{ color: THEME.text, fontSize: 17, fontWeight: "900" }}>
-              wow, desinstalle mon app tes trop nul
+              Serieux ?!
             </Text>
             <Text
               style={{ color: THEME.sub, textAlign: "center", marginTop: 6 }}
             >
-              {mock
-                ? "tes une honte !"
-                : reason || "Une erreur s’est glissée."}
+              {mock ? "tes une honte !" : reason || "Une erreur s’est glissée."}
             </Text>
             <PrimaryButton THEME={THEME} label="Quitter" onPress={onQuit} />
           </View>
@@ -140,8 +148,8 @@ export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) 
 export function VictoryLoading({
   THEME,
   visible,
-  title = "@#!$%&",
-  subtitle = "Le temps c'est de largent et toi ta aucun des deux.",
+  title = "Okayy....",
+  subtitle = "Bank—bankrolls, my funds increasing, yours looking chibi",
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -154,27 +162,18 @@ export function VictoryLoading({
         }}
       >
         <Card THEME={THEME} style={{ alignItems: "center", gap: 10, padding: 20 }}>
-          {/* 🖼️ Même image que le Game Over */}
-          <View
+          {/* Signature en haut à droite */}
+          <SignatureMark />
+
+          <Text
             style={{
-              width: 110,
-              height: 110,
-              borderRadius: 24,
-              backgroundColor: THEME.surface,
-              borderWidth: 1,
-              borderColor: THEME.border,
-              alignItems: "center",
-              justifyContent: "center",
+              color: THEME.text,
+              fontSize: 20,
+              fontWeight: "900",
+              marginTop: 4,
+              textAlign: "center",
             }}
           >
-            <Image
-              source={require("../../../assets/26xLogo.png")}
-              style={{ width: 80, height: 80 }}
-              resizeMode="contain"
-            />
-          </View>
-
-          <Text style={{ color: THEME.text, fontSize: 20, fontWeight: "900", marginTop: 4 }}>
             {title}
           </Text>
           <Text style={{ color: THEME.sub, textAlign: "center", marginTop: 4 }}>
@@ -194,14 +193,19 @@ export function VictoryLoading({
               borderColor: THEME.border,
             }}
           >
-            <View style={{ width: "100%", height: "100%", backgroundColor: THEME.accent }} />
+            <View
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: THEME.accent,
+              }}
+            />
           </View>
         </Card>
       </View>
     </Modal>
   );
 }
-
 
 /* -------------------- SKIP WITH CODE (fab) -------------------- */
 export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
@@ -246,7 +250,10 @@ export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
           }}
         >
           <Card THEME={THEME} style={{ gap: 12 }}>
-            <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>
+            <SignatureMark />
+            <Text
+              style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}
+            >
               Entrer le code pour passer
             </Text>
             <TextInput

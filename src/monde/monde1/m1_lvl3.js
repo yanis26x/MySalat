@@ -18,7 +18,7 @@ export default function M1_Lvl3({ onWin, onGameOver }) {
 
   return (
     <View style={{ gap: 12 }}>
-      <Section THEME={THEME} title="Pile ou face" subtitle="heyyyyyy" />
+      <Section THEME={THEME} title="Pile ou face" subtitle="NaNa 0 HaTch1" />
       <PrimaryButton THEME={THEME} label="Tenter" onPress={tryLuck} />
       <GhostButton THEME={THEME} label="Abandonner comme un lache" onPress={() => onGameOver?.("Abandon = Game Over.")} />
 

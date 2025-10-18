@@ -74,7 +74,7 @@ export default function M1_Lvl1({ onWin, onGameOver }) {
           shouldDuckAndroid: true,
         });
         const { sound } = await Audio.Sound.createAsync(
-          require("../../../assets/ha-ha.mp3")
+          require("../../../assets/qibla-success.mp3")
         );
         if (mounted) successRef.current = sound;
         else sound.unloadAsync().catch(() => {});
