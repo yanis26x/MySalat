@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* -------------------- CARD -------------------- */
 export function Card({ THEME, children, style }) {
@@ -15,7 +16,7 @@ export function Card({ THEME, children, style }) {
     <View
       style={[
         {
-          position: "relative", // nécessaire pour positionner la signature
+          position: "relative",
           backgroundColor: THEME.card,
           borderColor: THEME.border,
           borderWidth: 1,
@@ -85,7 +86,7 @@ export function Section({ THEME, title, subtitle }) {
   );
 }
 
-/* -------------------- SIGNATURE (petit logo en haut à droite) -------------------- */
+/* -------------------- SIGNATURE -------------------- */
 function SignatureMark() {
   return (
     <Image
@@ -117,9 +118,7 @@ export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) 
         }}
       >
         <Card THEME={THEME} style={{ padding: 20 }}>
-          {/* Signature en haut à droite */}
           <SignatureMark />
-
           <View style={{ alignItems: "center", gap: 10 }}>
             <Text
               style={{
@@ -129,12 +128,12 @@ export function GameOverModal({ THEME, visible, onQuit, reason, mock = false }) 
                 textAlign: "center",
               }}
             >
-              Serieux ?!
+              Sérieux ?!
             </Text>
             <Text
               style={{ color: THEME.sub, textAlign: "center", marginTop: 6 }}
             >
-              {mock ? "tes une honte !" : reason || "Une erreur s’est glissée."}
+              {mock ? "T’es une honte !" : reason || "Une erreur s’est glissée."}
             </Text>
             <PrimaryButton THEME={THEME} label="Quitter" onPress={onQuit} />
           </View>
@@ -162,9 +161,7 @@ export function VictoryLoading({
         }}
       >
         <Card THEME={THEME} style={{ alignItems: "center", gap: 10, padding: 20 }}>
-          {/* Signature en haut à droite */}
           <SignatureMark />
-
           <Text
             style={{
               color: THEME.text,
@@ -180,7 +177,6 @@ export function VictoryLoading({
             {subtitle}
           </Text>
 
-          {/* barre de “chargement” */}
           <View
             style={{
               marginTop: 10,
@@ -207,20 +203,21 @@ export function VictoryLoading({
   );
 }
 
-/* -------------------- SKIP WITH CODE (fab) -------------------- */
+/* -------------------- SKIP WITH CODE (TOP-RIGHT BUTTON) -------------------- */
 export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
   const [open, setOpen] = useState(false);
   const [val, setVal] = useState("");
+  const insets = useSafeAreaInsets();
 
   return (
     <>
-      {/* pastille flottante */}
+      {/* 🔝 Bouton flottant — TOUT EN HAUT À DROITE */}
       <Pressable
         onPress={() => setOpen(true)}
         style={{
           position: "absolute",
-          right: 16,
-          bottom: 16,
+          top: insets.top + 5, // collé au bord supérieur
+          right: 10,
           width: 56,
           height: 56,
           borderRadius: 28,
@@ -230,16 +227,17 @@ export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
           borderWidth: 1,
           borderColor: THEME.accent,
           shadowColor: "#000",
-          shadowOpacity: 0.2,
+          shadowOpacity: 0.25,
           shadowRadius: 6,
           shadowOffset: { width: 0, height: 3 },
-          elevation: 5,
+          elevation: 6,
+          zIndex: 9999,
         }}
       >
         <Ionicons name="key-outline" size={24} color="#fff" />
       </Pressable>
 
-      {/* modal code */}
+      {/* 🔐 Modal d’entrée du code */}
       <Modal visible={open} transparent animationType="fade">
         <View
           style={{
@@ -250,12 +248,10 @@ export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
           }}
         >
           <Card THEME={THEME} style={{ gap: 12 }}>
-            <SignatureMark />
-            <Text
-              style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}
-            >
+            <Text style={{ color: THEME.text, fontWeight: "900", fontSize: 16 }}>
               Entrer le code pour passer
             </Text>
+
             <TextInput
               value={val}
               onChangeText={setVal}
@@ -273,6 +269,7 @@ export function SkipWithCodeFab({ THEME, onValid, code = "77" }) {
                 color: THEME.text,
               }}
             />
+
             <View style={{ flexDirection: "row", gap: 10 }}>
               <GhostButton
                 THEME={THEME}

@@ -8,34 +8,70 @@ import { Audio } from "expo-av";
 const QUESTIONS_POOL = [
   {
     q: "Combien de prières obligatoires (salât) par jour ?",
-    choices: ["3", "5", "7", "2"],
-    correct: 1,
-    exp: "Il y a 5 prières : Fajr, Dhuhr, Asr, Maghrib, Isha.",
+    choices: ["3", "Ah c’est obligatoire ?!", "7", "5"],
+    correct: 3,
+    exp: "Il y a 5 prières : Fajr, Dhuhr, Asr, Maghrib et Isha.",
   },
   {
     q: "Quel mois est celui du jeûne obligatoire ?",
-    choices: ["Muharram", "Ramadan", "Shawwâl", "Dhou al-hijja"],
+    choices: ["Muharram", "Ramadan", "Shawwâl", "Septembre"],
     correct: 1,
     exp: "Le jeûne obligatoire a lieu pendant le mois de Ramadan.",
   },
   {
     q: "Vers quelle direction prie-t-on (Qibla) ?",
-    choices: ["Jérusalem", "Médine", "La Kaaba (La Mecque)", "Elle part dans l'espace"],
-    correct: 2,
+    choices: ["Jérusalem", "Médine", "Elle part dans l’espace", "La Kaaba (La Mecque)"],
+    correct: 3,
     exp: "La Qibla est dirigée vers la Kaaba, à La Mecque.",
   },
   {
-    q: "Combien de piliers de l’Islam ?",
-    choices: ["3", "4", "5", "6"],
+    q: "Combien de piliers compte l’Islam ?",
+    choices: ["3", "4", "5", "J’sais pas"],
     correct: 2,
-    exp: "Shahada, Salât, Zakât, Sawm, Hajj.",
+    exp: "Les cinq piliers : Shahada, Salât, Zakât, Sawm et Hajj.",
   },
   {
     q: "Quel est le Livre sacré de l’Islam ?",
-    choices: ["La Torah", "La Bible", "Le Coran", "Le OnePiece"],
+    choices: ["La Torah", "La Bible", "Le Coran", "Le One Piece"],
     correct: 2,
-    exp: "Le Coran est la révélation au Prophète ﷺ.",
+    exp: "Le Coran est la révélation divine transmise au Prophète ﷺ.",
   },
+  {
+    q: "Quel ange a transmis la révélation au Prophète Muhammad ﷺ ?",
+    choices: ["Israfil", "Jibril", "Mikail", "Azraël"],
+    correct: 1,
+    exp: "L’ange Jibril (Gabriel) a transmis les révélations du Coran.",
+  },
+  {
+    q: "Combien de rak‘as contient la prière du Fajr ?",
+    choices: ["2", "Ça dépend de la météo", "4", "5"],
+    correct: 0,
+    exp: "La prière du Fajr contient 2 unités de prière (rak‘as).",
+  },
+  {
+    q: "Quel est le premier pilier de l’Islam ?",
+    choices: ["Le Hajj", "La Shahada", "La Zakât", "Au city, y’avait l’imam, il avait amené 4 mecs de la mosquée pour faire un five. Ca les appelait les 5 piliers de l’Islam."],
+    correct: 1,
+    exp: "La Shahada : attester qu’il n’y a de dieu qu’Allah et que Muhammad est Son messager.",
+  },
+  {
+  q: "Quel prophète a survécu dans le ventre d’un poisson ?",
+  choices: ["Younous (Jonas)", "Moussa (Moïse)", "Issa (Jésus)", "Pas de spoil stp"],
+  correct: 0,
+  exp: "Le prophète Younous (Jonas) a été avalé par un grand poisson avant d’être sauvé par Allah.",
+},
+{
+  q: "Laquelle de ces salats n’existe pas ?",
+  choices: ["Salat al-Fajr", "Salat al-Isha", "Salat al-Asr", "Salat el-Christmas"],
+  correct: 3,
+  exp: "Bassem !",
+},
+{
+  q: "Que fait-on juste avant de commencer la prière ?",
+  choices: ["On enlève ses chaussures", "On met son téléphone en mode avion", "On fait des pompes", "+++++++++++"],
+  correct: 0,
+  exp: "Avant la prière, on retire ses chaussures et on se purifie pour montrer du respect.",
+},
 ];
 
 /** Utils */

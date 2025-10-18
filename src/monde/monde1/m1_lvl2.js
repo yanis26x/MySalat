@@ -89,7 +89,7 @@ export default function M1_Lvl2({ onWin, onGameOver }) {
     <View style={{ gap: 12 }}>
       <Section
         THEME={THEME}
-        title="Clique sur les etapes en ordre."
+        title="Clique sur les boutons dans le bon ordre"
       />
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>

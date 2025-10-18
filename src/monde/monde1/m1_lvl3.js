@@ -10,7 +10,7 @@ export default function M1_Lvl3({ onWin, onGameOver }) {
   function tryLuck() {
     const win = Math.random() < 0.5;
     if (!win) {
-      onGameOver?.("Meme dans les jeux dhasard tes null, tes bon a quoi ?!");
+      onGameOver?.("Même dans les jeux de hasard t’es nul… t’es bon à quoi, sérieux ?!");
       return;
     }
     onWin?.();
