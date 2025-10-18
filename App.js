@@ -24,6 +24,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import Footer from "./src/components/Footer";
 import Tabs from "./src/navigation/Tabs";
 import { useTranslation } from "react-i18next";
+import PlayScreen from "./src/screens/PlayScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import M1 from "./src/monde/m1";
+
+const Stack = createNativeStackNavigator();
 
 // Notifications
 Notifications.setNotificationHandler({
@@ -541,17 +546,30 @@ function HomeScreen() {
 /* ---------- APP (avec ThemeProvider + NavigationContainer + Tabs) ---------- */
 export default function App() {
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <Tabs
-          screens={{
-            Home: HomeScreen,
-            Qibla: QiblaScreen,
-            Learn: HowToScreen,
-            Parametres: ParametresScreen,
-          }}
-        />
-      </NavigationContainer>
-    </ThemeProvider>
+<ThemeProvider>
+  <NavigationContainer>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {/* 👇 Ton app principale avec les onglets */}
+      <Stack.Screen
+        name="Tabs"
+        children={() => (
+          <Tabs
+            screens={{
+              Home: HomeScreen,
+              Qibla: QiblaScreen,
+              Learn: HowToScreen,
+              Play: PlayScreen, // ou retire-le si tu veux que "Play" soit un écran séparé
+              Parametres: ParametresScreen,
+            }}
+          />
+        )}
+      />
+
+      {/* 👇 Monde 1 (et autres mondes plus tard) */}
+      <Stack.Screen name="M1" component={M1} />
+    </Stack.Navigator>
+  </NavigationContainer>
+</ThemeProvider>
+
   );
 }

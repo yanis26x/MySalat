@@ -1,0 +1,16 @@
+{
+  "title": "Islamic Quiz",
+  "subtitle": "Test your knowledge ✨",
+  "desc": "CGet a perfect score to unlock a special theme!",
+  "progress": "Progress",
+  "validate": "Validate",
+  "next": "Next",
+  "finish": "Finish",
+  "restart": "Play again",
+  "explain": "Explanation",
+  "resultTitle": "Result",
+  "resultBody": "Well done! Here’s your score:",
+  "playAgain": "Play again",
+  "close": "Close",
+  "cta": "Play"
+}

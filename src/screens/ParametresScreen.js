@@ -22,6 +22,7 @@ import { getPrayerTimesForDate } from "../prayerTimes";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import Footer from "../components/Footer";
 
+
 // 🆕 i18n
 import "../i18n/i18n"; // s'assure que i18n est initialisé
 import i18n from "../i18n/i18n";

@@ -1,0 +1,16 @@
+{
+  "title": "Quiz Islamique",
+  "subtitle": "Teste tes connaissances ✨",
+  "desc": "Réussis à obtenir une note parfaite pour débloquer un thème spécial !",
+  "progress": "Progression",
+  "validate": "Valider",
+  "next": "Suivant",
+  "finish": "Terminer",
+  "restart": "Rejouer",
+  "explain": "Explication",
+  "resultTitle": "Résultat",
+  "resultBody": "Bien joué ! Voici ton score :",
+  "playAgain": "Rejouer",
+  "close": "Fermer",
+  "cta": "Jouer"
+}
