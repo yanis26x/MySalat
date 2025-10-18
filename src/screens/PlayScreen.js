@@ -111,31 +111,30 @@ export default function PlayScreen() {
             Teste tes connaissances
           </Text>
           <Text style={{ color: THEME.sub, marginBottom: 14 }}>
-            Choisis un monde. Débloque-les un par un en réussissant les niveaux
-            sans game over !
+            Essaye d'arriver a la fin sans supprimer l'app.... 50$ au premier qui finit le niveau 3
           </Text>
 
           {/* Monde 1 — déverrouillé */}
           <WorldCard
             THEME={THEME}
-            title="Monde 1 — Initiation"
-            subtitle="QCM, wudu, dilemmas, timer & FINAL-ROUND26x"
+            title="DEBUTANT"
+            subtitle="Pour les enfants."
             onPress={() => navigation.navigate("M1")}
           />
 
           {/* Monde 2 — verrouillé */}
           <WorldCard
             THEME={THEME}
-            title="Monde 2 — À venir"
-            subtitle="Termine le Monde 1 pour débloquer"
+            title="MOYEN"
+            subtitle="h3LLo ?!"
             locked
           />
 
           {/* Monde 3 — verrouillé */}
           <WorldCard
             THEME={THEME}
-            title="Monde 3 — À venir"
-            subtitle="Termine le Monde 2 pour débloquer"
+            title="H4RDGORE"
+            subtitle="Du sang partout, pour les joueurs qui non de but dans la vie."
             locked
           />
         </ScrollView>
