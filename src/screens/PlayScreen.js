@@ -90,7 +90,7 @@ export default function PlayScreen() {
           </Pressable>
 
           <Text style={{ color: THEME.text, fontWeight: "800", fontSize: 16 }}>
-            Islamic Quiz
+            @yanis26x
           </Text>
 
           <View style={{ width: 40 }} />
@@ -118,15 +118,15 @@ export default function PlayScreen() {
           <WorldCard
             THEME={THEME}
             title="DEBUTANT"
-            subtitle="Pour les enfants."
+            subtitle="apprends les bases de l'islam"
             onPress={() => navigation.navigate("M1")}
           />
 
           {/* Monde 2 — verrouillé */}
           <WorldCard
             THEME={THEME}
-            title="MOYEN"
-            subtitle="h3LLo ?!"
+            title="INTERMEDIAIRE"
+            subtitle="finir débutant pour débloquer"
             locked
           />
 
@@ -134,7 +134,7 @@ export default function PlayScreen() {
           <WorldCard
             THEME={THEME}
             title="H4RDGORE"
-            subtitle="Du sang partout, pour les joueurs qui non de but dans la vie."
+            subtitle="finir intermédiaire pour débloquer"
             locked
           />
         </ScrollView>
